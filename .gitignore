@@ -1,5 +1,8 @@
 __pycache__/*
 token.pickle
 credentials.json
-.python-version/*
+.python-version
+secrets.py
 search
+*.log
+.DS_Store
