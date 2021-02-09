@@ -79,7 +79,12 @@ Delete the next section of code:
 At this point you should have a working sample code.
 
 ## Customising the script.
-You will need to update the code in the following section:
+You will need to update the code in this function:
+```python
+handle_each_email()
+```
+
+as well as this section in `main()`
 ```python
 if notifier == "NOTE1":
     logger.debug("Note1")
@@ -90,6 +95,8 @@ elif notifier == "NOTE2":
     # Your custom code goes here. Bot / Line
     processed = True
 ```
+
+
 If you are confused. Take a look at gmail.py which is my current working implementation.
 
 ## Automating Script Execution
