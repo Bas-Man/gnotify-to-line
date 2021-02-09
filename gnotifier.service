@@ -1,0 +1,12 @@
+[Unit]
+Description=Monitor Gmail Notifier
+Wants=gnotifier.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/ACCOUNT/gmail/gmail.py
+WorkingDirectory=/home/ACCOUNT/gmail
+
+
+[Install]
+WantedBy=multi-user.target

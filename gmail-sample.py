@@ -123,20 +123,20 @@ def get_new_label_id(new_label) -> str:
     return new_label.get('id')
 
 
-def get_folders(service, logger):
+def list_labels_on_setup(service):
     # Call the Gmail API
     try:
         results = service.users().labels().list(userId='me').execute()
     except Exception as e:
-        logger.error(e)
+        print(e)
     labels = results.get('labels', [])
 
     if not labels:
-        logger.info('No labels found.')
+        print('No labels found.')
     else:
-        logger.info('Labels:')
+        print('Labels:')
         for label in labels:
-            logger.info(label['name'])
+            print(label['name'])
 
 # End of Gmail Label functions
 
@@ -223,6 +223,27 @@ def main():
     logger = setupLogging()
     logger.info("Looking for email for notification")
     service = get_service()
+    # Stage 1 Check Connection
+    list_labels_on_setup(service)
+    sys.exit(0)
+    # Delete from service = get_service() to this line
+
+    # Stage 2 Create New Label
+    if secrets.LABEL_ID == "":
+        print("We are creating a new label.")
+        # Replace "" with the label name you wish to use.
+        name = ""
+        if len(name) == 0:
+            print("You have not yet set name See 'name = ""' in the code above")
+            print("Do that now and run the script again")
+            sys.exit(0)
+        new_label = define_label(name)
+        new_label = add_label_to_gmail(service, new_label, logger)
+        print(f"Your new label ID is: {get_new_label_id(new_label)}")
+        print("Set this in secrets.py")
+        sys.exit(0)
+    # Delete from service = get_service() to this line
+
     message_ids = get_message_ids(service, secrets.SEARCH_STRING, logger)
     if not found_messages(message_ids):
         logger.debug("There were no messages.")
@@ -233,27 +254,13 @@ def main():
         processed = False
         notifier, data = handle_each_email(service, message_id, logger)
         # Notifier tells us how the data dict is structured
-        if notifier == "BUS":
-            logger.debug("Bus")
-            message = (f"{secrets.NAME} boarded \n"
-                       f" the {data['busname']} bound for \n"
-                       f"{data['destination']} at stop: {data['stop']}\n"
-                       f"at {data['time']} on {data['date']}")
-            send_notification(message)
+        if notifier == "NOTE1":
+            logger.debug("Note1")
+            # Your custom code goes here. Bot / Line
             processed = True
-        elif notifier == "KIDZDUO":
-            logger.debug("KidsDuo")
-            message = (f"{secrets.NAME} KidzDuo notification.\n"
-                       f"{data['date']} at {data['time']}\n"
-                       f"KidzDuo{data['enterexit']}")
-            send_notification(message)
-            processed = True
-        elif notifier == "GATE":
-            logger.debug("Gate")
-            message = (f"{secrets.NAME} passed the school gate.\n"
-                       f"{data['date']} at {data['time']}"
-                       )
-            send_notification(message)
+        elif notifier == "NOTE2":
+            logger.debug("Note2")
+            # Your custom code goes here. Bot / Line
             processed = True
         elif notifier is None and data is not None:
             logger.warning(f"Subject matched but From was not matched")
