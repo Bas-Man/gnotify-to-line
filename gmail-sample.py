@@ -25,23 +25,12 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.modify',
           'https://www.googleapis.com/auth/gmail.labels']
 
 
-def setupLogging():
+def setup_logging():
     # supress google discovery_cache logging
     # https://github.com/googleapis/google-api-python-client/issues/299
     logging.getLogger('googleapiclient.discovery_cache').setLevel(
         logging.ERROR)
     logger = logging.getLogger("gmail-notifier")
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
-    # warning_handler = logging.FileHandler("gnotifier.log")
-    # warning_handler.setLevel(logging.WARNING)
-    # warning_handler.setFormatter(formatter)
-    # info_handler = logging.FileHandler("gnotifier.log")
-    # info_handler.setLevel(logging.INFO)
-    # info_handler.setFormatter(formatter)
-    # logger.addHandler(warning_handler)
-    # logger.addHandler(info_handler)
     logging.basicConfig(
         handlers=[RotatingFileHandler(LOG_FILE,
                                       maxBytes=100000,
@@ -224,7 +213,7 @@ def handle_each_email(service, message_id, logger) -> tuple:
 
 
 def main():
-    logger = setupLogging()
+    logger = setup_logging()
     logger.info("Looking for email for notification")
     service = get_service()
     # Stage 1 Check Connection
@@ -267,13 +256,13 @@ def main():
             # Your custom code goes here. Bot / Line
             processed = True
         elif notifier is None and data is not None:
-            logger.warning(f"Subject matched but From was not matched")
+            logger.warning("Subject matched but From was not matched")
         elif notifier is None and data is None:
-            logger.info(f"Non-Notification email from expected sender")
+            logger.info("Non-Notification email from expected sender")
         else:
             # We should not get here. But log it.
-            logger.warning(f"Something went wrong. Unexpected match. "
-                           f"Dont know how to handle data."
+            logger.warning("Something went wrong. Unexpected match. "
+                           "Dont know how to handle data."
                            )
         if processed:
             # Mail was processed. Add label so its not processed again
