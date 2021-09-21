@@ -1,12 +1,18 @@
-import pickle, os.path, sys, logging
+import pickle
+import os.path
+import sys
+import logging
 from logging.handlers import RotatingFileHandler
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
-import base64, email
+import base64
+import email
 from email import parser
 from email import policy
-import patterns, constants, secrets
+import patterns
+import constants
+import secrets
 from secrets import LINE_TOKEN
 from line_notify import LineNotify
 
@@ -19,23 +25,12 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.modify',
           'https://www.googleapis.com/auth/gmail.labels']
 
 
-def setupLogging():
+def setup_logging():
     # supress google discovery_cache logging
     # https://github.com/googleapis/google-api-python-client/issues/299
     logging.getLogger('googleapiclient.discovery_cache').setLevel(
         logging.ERROR)
     logger = logging.getLogger("gmail-notifier")
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
-    # warning_handler = logging.FileHandler("gnotifier.log")
-    # warning_handler.setLevel(logging.WARNING)
-    # warning_handler.setFormatter(formatter)
-    # info_handler = logging.FileHandler("gnotifier.log")
-    # info_handler.setLevel(logging.INFO)
-    # info_handler.setFormatter(formatter)
-    # logger.addHandler(warning_handler)
-    # logger.addHandler(info_handler)
     logging.basicConfig(
         handlers=[RotatingFileHandler(LOG_FILE,
                                       maxBytes=100000,
@@ -209,18 +204,16 @@ def handle_each_email(service, message_id, logger) -> tuple:
             logger.warning(f"Failed to process message_id: {message_id} "
                            f"Matched Subject: {subject} "
                            f"Sender not matched: {sender}")
-            pass
         return notifier, data
-    else:
-        # Not an expected subject line. Ignore this email
-        logger.info("This is not a notifcation.")
-        logger.info(f"sender: {sender}\n\t")
-        logger.info(f"subject: {subject}")
-        return notifier, data
+    # Not an expected subject line. Ignore this email
+    logger.info("This is not a notifcation.")
+    logger.info(f"sender: {sender}\n\t")
+    logger.info(f"subject: {subject}")
+    return notifier, data
 
 
 def main():
-    logger = setupLogging()
+    logger = setup_logging()
     logger.info("Looking for email for notification")
     service = get_service()
     # Stage 1 Check Connection
@@ -263,13 +256,13 @@ def main():
             # Your custom code goes here. Bot / Line
             processed = True
         elif notifier is None and data is not None:
-            logger.warning(f"Subject matched but From was not matched")
+            logger.warning("Subject matched but From was not matched")
         elif notifier is None and data is None:
-            logger.info(f"Non-Notification email from expected sender")
+            logger.info("Non-Notification email from expected sender")
         else:
             # We should not get here. But log it.
-            logger.warning(f"Something went wrong. Unexpected match. "
-                           f"Dont know how to handle data."
+            logger.warning("Something went wrong. Unexpected match. "
+                           "Dont know how to handle data."
                            )
         if processed:
             # Mail was processed. Add label so its not processed again

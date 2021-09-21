@@ -1,6 +1,8 @@
+""" Module containing our basic secrets"""
+
 SEARCH_STRING = "Gmail Search String"
 
-# Notifier laben ID
+# Notifier label ID
 LABEL_ID = ""
 
 LINE_TOKEN = "LINE TOKEN"

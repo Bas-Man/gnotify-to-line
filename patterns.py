@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+A list of patterns and functions for handling pattern matching.
 """
 
 import re
@@ -28,6 +29,13 @@ GATE_DATETIME = (
     r"(?P<time>\d{2}(?:[一-龯]|:)\d{2}(?:[一-龯]|[:])\d{2}(?:[一-龯]|))"
     )
 
+# Train Date and Time
+TRAIN_DATA = (
+    r"(?P<date>\d{2}月\d{2}日)　(?P<time>\d{2}時\d{2}分)\n"
+    r"タマオアイビーローズさん\n"
+    r"「(?P<provider>[一-龯]+)・(?P<station>[一-龯]+)」を(?P<enterexit>[一-龯]+)"
+)
+
 
 def findMatches(string, regex) -> dict:
     """
@@ -47,7 +55,7 @@ def findMatches(string, regex) -> dict:
     """
     match = re.search(regex, string, re.UNICODE | re.MULTILINE)
     if match:
-        matches = dict()
+        matches = {}
         for key in match.groupdict():
             matches[key] = match.group(key)
         return matches
