@@ -134,23 +134,37 @@ def define_label(name, mlv="show", llv="labelShow") -> dict:
     return label
 
 
-def add_label_to_gmail(service, label, logger) -> dict:
-    try:
-        created_label = service.users().labels().create(userId='me',
-                                                        body=label).execute()
-        return created_label
-    except Exception as e:
-        logger.error(e)
+def register_label_with_gmail(service, label) -> dict:
+    """
+    Register the provide label with the gmail system.
+    :param service: The gmail service
+    :type service: object
+    :param label: Label to be registered
+    :type label: dict
+    :return: The label and associated details from gmail.
+    :rtype: dict
+    """
+    created_label = service.users().labels().create(userId='me',
+                                                    body=label).execute()
+    return created_label
 
 
-def get_label_id(list_of_labels) -> str:
-    for label in list_of_labels:
-        if label['name'] == name:
-            return label['id']
-    return None
+def get_label_id(label) -> str:
+    """
+    obtain new label using id.
+    :param label: Gmail label
+    :type label: dict
+    :return: The id of the label passed in to the function
+    :rtype: str
+    """
+    return label.get('id')
 
 
 def get_new_label_id(new_label) -> str:
+    """
+    Get a list of Gmail folders.
+    Writes information to the log file.
+    """
     return new_label.get('id')
 
 
