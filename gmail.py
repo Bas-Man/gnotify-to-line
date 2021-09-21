@@ -160,14 +160,6 @@ def get_label_id(label) -> str:
     return label.get('id')
 
 
-def get_new_label_id(new_label) -> str:
-    """
-    Get a list of Gmail folders.
-    Writes information to the log file.
-    """
-    return new_label.get('id')
-
-
 def get_folders(service, logger):
     # Call the Gmail API
     try:
