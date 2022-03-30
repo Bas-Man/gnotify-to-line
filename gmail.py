@@ -277,6 +277,9 @@ def handle_each_email(service, message_id, logger) -> tuple:
         elif sender == constants.FROM_TRAIN:
             data = patterns.findMatches(email_body, patterns.TRAIN_DATA)
             notifier = "TRAIN"
+        elif sender == constants.FROM_NICHINOKEN:
+            data = patterns.findMatches(email_body, patterns.NICHI_DATE)
+            notifier = "NICHINOKEN"
         else:
             # This needs to be logged. Means failed to match sender.
             # if notifier is None:
@@ -337,6 +340,13 @@ def main():
             message = (f"{secrets.NAME} Train Notification.\n"
                        f"{data['date']} at {data['time']}\n"
                        f"{status} {data['station']}"
+                       )
+            send_notification(message)
+            processed = True
+        elif notifier == "NICHINOKEN":
+            logger.debug("Nichinoken")
+            message = (f"{secrets.NAME} Nichinoken.\n"
+                       f"{data['date']} at {data['time']}"
                        )
             send_notification(message)
             processed = True
