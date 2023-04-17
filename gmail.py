@@ -265,21 +265,26 @@ def handle_each_email(service, message_id, logger) -> tuple:
                                             patterns.BUS_DATE_TIME)
             # Merge data and datetime into a single dictionary
             data.update(datetime)
+            data[notifier] = "BUS"
             notifier = "BUS"
         elif sender == constants.FROM_KIDZDUO:
             data = patterns.findMatches(email_body,
                                         patterns.KIDZDUO_ENTEREXIT)
+            data[notifier] = "KIDZDUO"
             notifier = "KIDZDUO"
         elif sender == constants.FROM_GATE:
             data = patterns.findMatches(email_body,
                                         patterns.GATE_DATETIME)
+            data[notifier] = "GATE"
             notifier = "GATE"
         elif sender == constants.FROM_TRAIN:
             data = patterns.findMatches(email_body, patterns.TRAIN_DATA)
+            data[notifier] = "TRAIN"
             notifier = "TRAIN"
         elif sender == constants.FROM_NICHINOKEN:
             data = patterns.findMatches(email_body, patterns.NICHI_DATE)
             notifier = "NICHINOKEN"
+            data[notifier] = "NICHINOKEN"
         else:
             # This needs to be logged. Means failed to match sender.
             # if notifier is None:
@@ -294,7 +299,7 @@ def handle_each_email(service, message_id, logger) -> tuple:
     return notifier, data
 
 
-def main():
+def main():  # pylint: disable=too-many-branches,too-many-statements
     logger = setup_logging()
     logger.info("Looking for email for notification")
     service = get_service()
@@ -313,7 +318,8 @@ def main():
             message = (f"{secrets.NAME} boarded \n"
                        f" the {data['busname']} bound for \n"
                        f"{data['destination']} at stop: {data['stop']}\n"
-                       f"at {data['time']} on {data['date']}")
+                       f"at {data['time']} on {data['date']}"
+                       )
             send_notification(message)
             processed = True
         elif notifier == "KIDZDUO":
