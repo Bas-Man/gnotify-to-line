@@ -7,13 +7,14 @@ import email
 from email import parser
 from email import policy
 
-SEARCH_STRING = "((label:tamao-kidsduo OR label:tamao-pasmo"\
- ") AND -label:notified)"\
- "AND newer_than:1d"
+SEARCH_STRING = "((label:tamao-kidsduo OR label:tamao-pasmo" \
+                ") AND -label:notified)" \
+                "AND newer_than:1d"
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify',
           'https://www.googleapis.com/auth/gmail.labels']
+
 
 def get_service():
     """Shows basic usage of the Gmail API.
@@ -42,17 +43,19 @@ def get_service():
     service = build('gmail', 'v1', credentials=creds)
     return service
 
+
 def get_labels(service):
     list_of_labels = service.users().labels().list(userId='me').execute()
     return list_of_labels.get('labels')
 
-    
+
 def define_label(name, mlv="show", llv="labelShow"):
     label = dict()
     label["messageListVisibility"] = mlv
     label["labelListVisibility"] = llv
     label["name"] = name
     return label
+
 
 def add_label_to_gmail(service, label):
     try:
@@ -62,11 +65,12 @@ def add_label_to_gmail(service, label):
     except Exception as e:
         logger.error(e)
 
+
 def get_new_label_id(new_label):
     return new_label.get('id')
 
-def get_message_ids(service, search_string):
 
+def get_message_ids(service, search_string):
     try:
         search = service.users().messages().list(userId='me',
                                                  q=search_string).execute()
@@ -74,13 +78,16 @@ def get_message_ids(service, search_string):
         logger.warning("Something went wrong with the http request.")
     return search
 
+
 def get_only_message_ids(message_ids):
     ids = []
     for anId in message_ids['messages']:
         ids.append(anId['id'])
     return ids
 
+
 MESSAGE_ID = "1775d10a91ba4249"
+
 
 def get_message(service, msg_id):
     msg = service.users().messages().get(userId='me',
@@ -93,8 +100,10 @@ def get_message(service, msg_id):
     resulting_email = emailParser.parsestr(email_tmp.as_string())
     return resulting_email
 
+
 def main():
     service = get_service()
-    
+
+
 if __name__ == '__main__':
     main()

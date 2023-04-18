@@ -6,3 +6,7 @@ secrets.py
 search
 *.log
 .DS_Store
+.env
+__pycache__
+src/gmail2line.egg-info
+src/gmail2line/__pycache__/**

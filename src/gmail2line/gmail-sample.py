@@ -1,4 +1,3 @@
-import pickle
 import os.path
 import sys
 import logging
@@ -13,7 +12,6 @@ from email import policy
 import patterns
 import constants
 import secrets
-from secrets import LINE_TOKEN
 from line_notify import LineNotify
 
 ACCESS_TOKEN = LINE_TOKEN
@@ -41,7 +39,7 @@ def setup_logging():
     return logger
 
 
-def send_notification(message):
+def send_notification(message: str):
     notice = LineNotify(ACCESS_TOKEN)
     notice.send(message)
 
@@ -107,7 +105,7 @@ def add_label_to_gmail(service, label, logger) -> dict:
         logger.error(e)
 
 
-def get_label_id(list_of_labels) -> str:
+def get_label_id(list_of_labels):
     for label in list_of_labels:
         if label['name'] == name:
             return label['id']
@@ -122,28 +120,28 @@ def list_labels_on_setup(service):
     # Call the Gmail API
     try:
         results = service.users().labels().list(userId='me').execute()
+        labels = results.get('labels', [])
+        if not labels:
+            print('No labels found.')
+        else:
+            print('Labels:')
+            for label in labels:
+                print(label['name'])
+
     except Exception as e:
         print(e)
-    labels = results.get('labels', [])
-
-    if not labels:
-        print('No labels found.')
-    else:
-        print('Labels:')
-        for label in labels:
-            print(label['name'])
 
 # End of Gmail Label functions
 
 
-def get_message_ids(service, search_string, logger) -> dict:
+def get_message_ids(service, search_string, logger):
 
     try:
         search = service.users().messages().list(userId='me',
                                                  q=search_string).execute()
+        return search
     except (errors.HttpError, error):
         logger.warning("Something went wrong with the http request.")
-    return search
 
 
 def found_messages(message_ids) -> bool:

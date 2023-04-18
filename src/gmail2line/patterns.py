@@ -4,6 +4,7 @@ A list of patterns and functions for handling pattern matching.
 """
 
 import re
+from typing import Dict, List, Optional
 
 # KidzDuo
 KIDZDUO_ENTEREXIT = (
@@ -36,13 +37,21 @@ TRAIN_DATA = (
     r"「(?P<provider>[一-龯]+)・(?P<station>[一-龯]+)」を(?P<enterexit>[一-龯]+)"
 )
 
+# Institution Date, Time and Location
+INSTITUTE_DATA = (
+    r"スパン 碧桜アイビーローズ さんが\s(?:\d{4}年)"
+    r"(?P<date>(?:\d{2}(?:[一-龯])\d{2}(?:[一-龯])\s\d{2}(?:[一-龯])\d{2}(?:[一-龯])))"
+    r"\s(?P<enterexit>(?:に入室しました)|(?:に退室しました))。"
+    r"（(?P<location>(?:[一-龯]+))）"
+)
+
 NICHI_DATE = (
     r"(?P<date>\d{2}月\d{2}日)\s(?P<time>\d{2}時\d{2}分)"
     r"(?:(?:(?:\r)?\n)+[^\n]+)(?:\r)?\n「日能研　駒沢大学校　1」"
 )
 
 
-def findMatches(string, regex) -> dict:
+def findMatches(string, regex) -> Dict[str, str]:
     """
     This is a generic matching function.
     Warning! Your regex expression MUST use 'Named Groups' -> (:P<name>) or \
@@ -65,4 +74,4 @@ def findMatches(string, regex) -> dict:
             matches[key] = match.group(key)
         return matches
     # No Matches
-    return None
+    return {}
