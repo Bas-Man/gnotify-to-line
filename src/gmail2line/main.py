@@ -3,43 +3,48 @@ from pathlib import Path
 import sys
 import os
 import argparse
-import glogger
-import toml_handler
 import base64
 import email
 from email import parser
 from email import policy
-import secrets
-import gmail
-import line
-import constants
-import patterns
+from typing import Dict, Optional
 from dotenv import load_dotenv
-from typing import Dict, List, Optional
 from googleapiclient.errors import HttpError
 import message_builder
+import config_parser
+from patterns import findMatches
+import glogger
+import line
+from error_codes import Errors
+import gmail
 
 load_dotenv()
 
 NAME = os.getenv("NAME_1")
-LABEL_ID = os.getenv("LABEL_ID")
-ACCESS_TOKEN = os.getenv("LINE_TOKEN")
 
 PICKLE = "token.pickle"
 CONFIG_DIR = Path.home() / ".config" / "gmail-notify"
 TOML_FILE = CONFIG_DIR / "config.toml"
 
+# Read TOML Configuration File
+config = config_parser.load_toml(TOML_FILE)
 
 def list_all_labels_and_ids(logger):
+    """
+    Document me
+    """
     logger.info("Looking up all Labels and IDs")
     service = gmail.get_service(CONFIG_DIR)
     labels = gmail.get_labels(service)
     for label in labels:
-      print(f"Label: {label.get('name')} -> ID: {label.get('id')}")
+        print(f"Label: {label.get('name')} -> ID: {label.get('id')}")
     logger.info("Finished lookup all Labels and IDs")
 
 
 def lookup_label_id(logger, args):
+    """
+    Document me
+    """
     logger.info(f"Looking up Label ID for Label: {args.label}")
     service = gmail.get_service(CONFIG_DIR)
     print(f"Looking for label {args.label}")
@@ -49,20 +54,35 @@ def lookup_label_id(logger, args):
     logger.info("Finished looking up Label ID.")
 
 def cli():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-l", "--label")
-    parser.add_argument("-la", "--label-all", action='store_true')
-    args = parser.parse_args()
+    """
+    Document me
+    """
+    parse = argparse.ArgumentParser()
+    parse.add_argument("-l", "--label")
+    parse.add_argument("-la", "--label-all", action='store_true')
+    args = parse.parse_args()
 
-    logger = glogger.setup_logging(CONFIG_DIR)
-
+    logger = glogger.setup_logging(CONFIG_DIR, config['log'].get('lvl'))
     if args.label_all:
         list_all_labels_and_ids(logger)
     elif args.label:
         lookup_label_id(logger, args)
     else:
-      print("processing")
-      process()
+        # Default: Sanity check and call process()
+        LABEL_ID = os.getenv("LABEL_ID")
+        if LABEL_ID is None:
+            logger.error("No Label ID found. Unable to process any message.")
+            logger.info("Processing ending early.")
+            sys.exit(Errors.NO_LABEL_ID)
+        else:
+            ACCESS_TOKEN = os.getenv("LINE_TOKEN_PERSONAL")
+            if ACCESS_TOKEN is None:
+                logger.error("No LINE Access Token found. Unable to send LINE messages.")
+                logger.error("Unable to process messages.")
+                logger.info("Processing ending early.")
+                sys.exit(Errors.NO_LINE_ACCESS_TOKEN)
+            else:
+                process(logger, ACCESS_TOKEN, LABEL_ID)
 
 
 def found_messages(message_ids) -> bool:
@@ -72,13 +92,6 @@ def found_messages(message_ids) -> bool:
     :rtype: bool
     """
     return bool(message_ids['resultSizeEstimate'])
-
-
-def get_only_message_ids(message_ids) -> list:
-    ids = []
-    for message_id in message_ids['messages']:
-        ids.append(message_id['id'])
-    return ids
 
 
 def get_message(service, msg_id: str, logger) -> Optional[email.message.EmailMessage]:
@@ -102,7 +115,6 @@ def get_message(service, msg_id: str, logger) -> Optional[email.message.EmailMes
                                              policy=policy.default)
         email_parser = parser.Parser(policy=policy.default)
         resulting_email = email_parser.parsestr(email_tmp.as_string())
-        #return resulting_email
     except HttpError as error:
         logger.error(f"Unable to get message for {msg_id} with error {error}")
         return None
@@ -120,128 +132,92 @@ def handle_each_email(service, message_id, logger) -> dict:
     :type message_id: str
     :param logger: The logger object
     :type logger: object
-    :return: The data extracted from the email. Notifier and data.
-    :rtype: tuple
+    :return: The data extracted from the email.
+    :rtype: dict
     """
-    senders, subjects = toml_handler.senders_subjects(toml_handler.load_toml(TOML_FILE))
+    # Get data from config so that it is easier to use.
+    _, subjects, sender_service_key = config_parser.senders_subjects(config)
     data: Dict[str, str] = {}
     single_email = get_message(service, message_id, logger)
     # Check the subject is an expected notification subject line
-    subject = single_email.get("subject")
-    logger.debug(f"Subject: {subject}")
-    sender: str
-    if subject in subjects:
-        # workout which notification we are dealing with and use the correct
-        # regular expression string
-        logger.debug(f"Subject Passed.")
-        sender = single_email.get("from")
+    if single_email is not None and 'subject' in single_email:
+        subject: str = single_email.get("subject")
+        logger.debug(f"Subject: {subject}")
+        sender: str = single_email.get("from")
         logger.debug(f"Sender: {sender}")
-        email_body = single_email.get_content()
-        if sender == constants.FROM_BUS:
-            data = patterns.findMatches(email_body,
-                                        patterns.BUS_DATA)
-            datetime = patterns.findMatches(email_body,
-                                            patterns.BUS_DATE_TIME)
-            # Merge data and datetime into a single dictionary
-            if data is not None:
-                data.update(datetime)
-                data['notifier'] = "BUS"
-        elif sender == constants.FROM_INSTITUTE:
-            data = patterns.findMatches(email_body,
-                                        patterns.INSTITUTE_DATA)
-            data['notifier'] = "INSTITUTE"
-        elif sender == constants.FROM_KIDZDUO:
-            data = patterns.findMatches(email_body,
-                                        patterns.KIDZDUO_ENTEREXIT)
-            data['notifier'] = "KIDZDUO"
+        if subject in subjects:
+            # workout which notification we are dealing with and use the correct
+            # regular expression string
+            logger.debug("Subject Passed.")
+            key = sender_service_key.get(sender)
+            if key is not None and key in config['services']:
+                if 'regex' in config['services'][key]:
+                    regex: str = config['services'][key].get('regex')
+                    email_body = single_email.get_content()
+                    data: Dict[str, str] = findMatches(email_body, regex)
+                    data['notifier'] = key
+                    return data
+            else:
+                # This needs to be logged. Means failed to match sender.
+                logger.warning(f"Failed to process message_id: {message_id} "
+                               f"Matched Subject: {subject} "
+                               f"Sender not matched: {sender}")
+                return data
 
-        elif sender == constants.FROM_GATE:
-            data = patterns.findMatches(email_body,
-                                        patterns.GATE_DATETIME)
-            data['notifier'] = "GATE"
-
-        elif sender == constants.FROM_TRAIN:
-            data = patterns.findMatches(email_body, patterns.TRAIN_DATA)
-            data['notifier'] = "TRAIN"
-
-        elif sender == constants.FROM_NICHINOKEN:
-            data = patterns.findMatches(email_body, patterns.NICHI_DATE)
-
-            data['notifier'] = "NICHINOKEN"
-        else:
-            # This needs to be logged. Means failed to match sender.
-            # if notifier is None:
-            logger.warning(f"Failed to process message_id: {message_id} "
-                           f"Matched Subject: {subject} "
-                           f"Sender not matched: {sender}")
-        return data
-    # Not an expected subject line. Ignore this email
-    logger.info("This is not a notifcation.")
-    logger.info(f"sender: {sender}\n\t")
-    logger.info(f"subject: {subject}")
+        # Not an expected subject line. Ignore this email
+        logger.info("This is not a notifcation.")
+        logger.info(f"sender: {sender}\n\t")
+        logger.info(f"subject: {subject}\n")
+        logger.debug(f"contents: {single_email.get_content()}\n")
+        logger.debug(f"Data: {data}\n")
     return data
 
 
-def process():  # pylint: disable=too-many-branches,too-many-statements
-    logger = glogger.setup_logging(CONFIG_DIR)
+def process(logger, line_token: str, processed_label: str):  # pylint: disable=too-many-branches,too-many-statements
+    """
+    Document me
+    """
     logger.info("Looking for email for notification")
     service = gmail.get_service(CONFIG_DIR)
-    message_ids = gmail.get_message_ids(service, secrets.SEARCH_STRING)
+    g_search = config_parser.gmail_search_string(config)
+    if g_search is None:
+        logger.info("Search String is not valid. Unable to get messages.")
+        sys.exit(Errors.MISSING_GOOGLE_SEARCH_STRING)
+    message_ids = gmail.get_message_ids(service, g_search)
     if not found_messages(message_ids):
         logger.debug("There were no messages.")
         logger.info("Ending cleanly with no messages to process")
-        sys.exit(0)
-    list_of_message_ids = get_only_message_ids(message_ids)
+        sys.exit(Errors.OK)
+    list_of_message_ids = gmail.get_only_message_ids(message_ids)
     logger.debug(f"message_ids:\n\t{list_of_message_ids}\n")
     for message_id in list_of_message_ids:
         processed = False
         data = handle_each_email(service, message_id, logger)
+        logger.debug(data['notifier'].capitalize())
         logger.debug(f"data: {data}\n")
-        # Notifier tells us how the data dict is structured
-        if data['notifier'] == "BUS":
-            logger.debug("Bus")
-            message = (f"{NAME} boarded \n"
-                       f" the {data['busname']} bound for \n"
-                       f"{data['destination']} at stop: {data['stop']}\n"
-                       f"at {data['time']} on {data['date']}"
-                       )
-            line.send_notification(message_builder.bus(NAME, data), ACCESS_TOKEN)
+        message = message_builder.call_function(NAME, data)
+        if message:
+            logger.debug(data['notifier'].capitalize())
+            line.send_notification(message, line_token)
             processed = True
-        elif data['notifier'] == "KIDZDUO":
-            logger.debug("KidsDuo")
-            line.send_notification(message_builder.kidzduo(NAME, data), ACCESS_TOKEN)
-            processed = True
-        elif data['notifier'] == "GATE":
-            logger.debug("Gate")
-            line.send_notification(message_builder.gate(NAME, data), ACCESS_TOKEN)
-            processed = True
-        elif data['notifier'] == "TRAIN":
-            logger.debug("Train")
-            line.send_notification(message_builder.train(NAME, data), ACCESS_TOKEN)
-            processed = True
-        elif data['notifier'] == "NICHINOKEN":
-            logger.debug("Nichinoken")
-            line.send_notification(message_builder.nichinoken(NAME, data), ACCESS_TOKEN)
-            processed = True
-        elif data['notifier'] == "INSTITUTE":
-            logger.debug("Institute")
-            line.send_notification(message_builder.institution(NAME, data), ACCESS_TOKEN)
-            processed = True
-        elif data.get("notifier") is None and data is not None:
+        else:
+            logger.info(f"Caller: {data['notifier']} is not a callable function.")
+
+        if data.get("notifier") is None and data is not None:
             logger.warning("Subject matched but From was not matched")
         elif data.get("notifier") is None and data is None:
             logger.info("Non-Notification email from expected sender")
-        else:
-            # We should not get here. But log it.
-            logger.warning("Something went wrong. Unexpected match. "
-                           "Dont know how to handle data."
-                           )
+
         if processed:
             # Mail was processed. Add label so its not processed again
             # Gmail only allows for the shortest time interval of one day.
             logger.debug("adding label")
             gmail.add_label_to_message(
-                service, message_id, LABEL_ID)
+                service, message_id, processed_label)
+            if config_parser.should_mail_be_archived(
+                config_parser.gmail_archive_setting(config),
+                config['services'][data['notifier']].get('archive')):
+                gmail.archive_message(service, message_id)
             # End of the program
     logger.info("Ending cleanly")
 

@@ -1,10 +1,13 @@
+"""
+Document me
+"""
 import pickle
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from googleapiclient.errors import HttpError
 from pathlib import Path
 from typing import Dict, List, Optional
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 PICKLE = "token.pickle"
 
@@ -23,6 +26,7 @@ def get_service(config_dir: Path):
     # created automatically when the authorization flow completes for the first
     # time.
     pickle_file = get_valid_path(config_dir, PICKLE)
+    credentials_json = get_valid_path(config_dir, '.credentials.json')
     if pickle_file is not None:
         with pickle_file.open("rb") as f:
             creds = pickle.load(f)
@@ -31,8 +35,10 @@ def get_service(config_dir: Path):
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            # I suspect that 'credentials_json' needs to be converted from \
+            # Path to str to work correctly?
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                credentials_json, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         # If there is no pickle file we store it in the .config/app directory
@@ -41,17 +47,19 @@ def get_service(config_dir: Path):
         with pickle_file.open('wb') as token:
             pickle.dump(creds, token)
     # Another option to ignore google cache logging issue
-    # service = build('gmail', 'v1', credentials=creds, cache_discovery=False)
+    # return build('gmail', 'v1', credentials=creds, cache_discovery=False)
     return build('gmail', 'v1', credentials=creds)
 
 def get_valid_path(config_dir: Path, filename: str) -> Optional[Path]:
+    """
+    Document me
+    """
     # Check if file exists in the current directory
     current_dir_path = Path.cwd() / filename
     if current_dir_path.exists():
         return current_dir_path
 
     # Check if file exists in ~/.config/somedir/
-    home_dir = Path.home()
     config_path = config_dir / filename
     if config_path.exists():
         return config_path
@@ -60,6 +68,9 @@ def get_valid_path(config_dir: Path, filename: str) -> Optional[Path]:
     return None
 
 def get_only_message_ids(message_ids) -> list:
+    """
+    Document me
+    """
     ids = []
     for message_id in message_ids['messages']:
         ids.append(message_id['id'])
@@ -93,6 +104,22 @@ def add_label_to_message(service, msg_id: str, label_id: str) -> str:
                                             id=msg_id,
                                             body={'removeLabelIds': [],
                                                   'addLabelIds': [label_id]}
+                                            ).execute()
+    return msg
+
+def archive_message(service, msg_id) -> str:
+    """
+    Add gmail label to given message.
+    :param service: Gmail service connection object
+    :type service:
+    :param msg_id: message identifier
+    :type msg_id: str
+    :return: msg
+    """
+    msg = service.users().messages().modify(userId='me',
+                                            id=msg_id,
+                                            body={'removeLabelIds': ['INBOX'],
+                                                  'addLabelIds': []}
                                             ).execute()
     return msg
 
@@ -142,12 +169,18 @@ def get_label_id(label) -> str:
     return label.get('id')
 
 def get_label_id_from_list(list_of_labels: List, name: str) -> Optional[str]:
+    """
+    Document me
+    """
     for label in list_of_labels:
         if label['name'] == name:
             return label['id']
     return None
 
 def get_folders(service, logger):
+    """
+    Document me
+    """
     # Call the Gmail API
     try:
         results = service.users().labels().list(userId='me').execute()
@@ -164,7 +197,7 @@ def get_folders(service, logger):
         logger.error(e)
 
 
-def get_message_ids(service, search_string) -> dict:
+def get_message_ids(service, search_string: str) -> dict:
     """
     Searchs Gmail for any messages that match the search string provided.
     :param service: The Gmail API connection.
