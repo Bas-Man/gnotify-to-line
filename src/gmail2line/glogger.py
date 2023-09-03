@@ -15,6 +15,7 @@ def setup_logging(config_dir: Path, level: str):
     :param level: The Level that logger should run at. Values can be \
     INFO, WARN, DEBUG
     :type level: str
+    :returns: An instance of logger.
     """
     # suopress google discovery_cache logging
     # https://github.com/googleapis/google-api-python-client/issues/29
