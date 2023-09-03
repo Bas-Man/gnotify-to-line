@@ -3,19 +3,16 @@ from pathlib import Path
 import sys
 import os
 import argparse
-import base64
-import email
 from email import parser
 from email import policy
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 from dotenv import load_dotenv
-from googleapiclient.errors import HttpError
 import message_builder
 import config_parser
-from patterns import findMatches
+from patterns import find_matches
 import glogger
 import line
-from error_codes import Errors
+from exit_codes import ExitCodes
 import gmail
 
 load_dotenv()
@@ -29,29 +26,6 @@ TOML_FILE = CONFIG_DIR / "config.toml"
 # Read TOML Configuration File
 config = config_parser.load_toml(TOML_FILE)
 
-def list_all_labels_and_ids(logger):
-    """
-    Document me
-    """
-    logger.info("Looking up all Labels and IDs")
-    service = gmail.get_service(CONFIG_DIR)
-    labels = gmail.get_labels(service)
-    for label in labels:
-        print(f"Label: {label.get('name')} -> ID: {label.get('id')}")
-    logger.info("Finished lookup all Labels and IDs")
-
-
-def lookup_label_id(logger, args):
-    """
-    Document me
-    """
-    logger.info(f"Looking up Label ID for Label: {args.label}")
-    service = gmail.get_service(CONFIG_DIR)
-    print(f"Looking for label {args.label}")
-    labels = gmail.get_labels(service)
-    label_id = gmail.get_label_id_from_list(labels, args.label)
-    print(f"Id for label: {args.label} -> ID: {label_id}")
-    logger.info("Finished looking up Label ID.")
 
 def cli():
     """
@@ -64,62 +38,25 @@ def cli():
 
     logger = glogger.setup_logging(CONFIG_DIR, config['log'].get('lvl'))
     if args.label_all:
-        list_all_labels_and_ids(logger)
+        gmail.list_all_labels_and_ids(CONFIG_DIR, logger)
     elif args.label:
-        lookup_label_id(logger, args)
+        gmail.lookup_label_id(CONFIG_DIR, logger, args)
     else:
         # Default: Sanity check and call process()
         LABEL_ID = os.getenv("LABEL_ID")
         if LABEL_ID is None:
             logger.error("No Label ID found. Unable to process any message.")
             logger.info("Processing ending early.")
-            sys.exit(Errors.NO_LABEL_ID)
+            sys.exit(ExitCodes.NO_LABEL_ID)
         else:
-            ACCESS_TOKEN = os.getenv("LINE_TOKEN_PERSONAL")
+            ACCESS_TOKEN = os.getenv("LINE_TOKEN")
             if ACCESS_TOKEN is None:
                 logger.error("No LINE Access Token found. Unable to send LINE messages.")
                 logger.error("Unable to process messages.")
                 logger.info("Processing ending early.")
-                sys.exit(Errors.NO_LINE_ACCESS_TOKEN)
+                sys.exit(ExitCodes.NO_LINE_ACCESS_TOKEN)
             else:
                 process(logger, ACCESS_TOKEN, LABEL_ID)
-
-
-def found_messages(message_ids) -> bool:
-    """
-    Return a boolean to indicate if any message have been found.
-    :param message_ids:
-    :rtype: bool
-    """
-    return bool(message_ids['resultSizeEstimate'])
-
-
-def get_message(service, msg_id: str, logger) -> Optional[email.message.EmailMessage]:
-    """
-    Retrive the email message assicated with the given msg_id
-    :param service: Gmail API connection
-    :type service: object
-    :param msg_id: The id for the requested message.
-    :type msg_id: str
-    :param logger: Logger to pass information.
-    :type logger: object
-    :return: The Email message referenced by mss_id
-    :rtype: email.message.EmailMessage
-    """
-    try:
-        msg = service.users().messages().get(userId='me',
-                                             id=msg_id,
-                                             format='raw').execute()
-        msg_in_bytes = base64.urlsafe_b64decode(msg['raw'].encode('ASCII'))
-        email_tmp = email.message_from_bytes(msg_in_bytes,
-                                             policy=policy.default)
-        email_parser = parser.Parser(policy=policy.default)
-        resulting_email = email_parser.parsestr(email_tmp.as_string())
-    except HttpError as error:
-        logger.error(f"Unable to get message for {msg_id} with error {error}")
-        return None
-    else:
-        return resulting_email
 
 
 def handle_each_email(service, message_id, logger) -> dict:
@@ -138,7 +75,7 @@ def handle_each_email(service, message_id, logger) -> dict:
     # Get data from config so that it is easier to use.
     _, subjects, sender_service_key = config_parser.senders_subjects(config)
     data: Dict[str, str] = {}
-    single_email = get_message(service, message_id, logger)
+    single_email = gmail.get_message(service, message_id, logger)
     # Check the subject is an expected notification subject line
     if single_email is not None and 'subject' in single_email:
         subject: str = single_email.get("subject")
@@ -154,7 +91,7 @@ def handle_each_email(service, message_id, logger) -> dict:
                 if 'regex' in config['services'][key]:
                     regex: str = config['services'][key].get('regex')
                     email_body = single_email.get_content()
-                    data: Dict[str, str] = findMatches(email_body, regex)
+                    data: Dict[str, str] = find_matches(email_body, regex)
                     data['notifier'] = key
                     return data
             else:
@@ -182,12 +119,12 @@ def process(logger, line_token: str, processed_label: str):  # pylint: disable=t
     g_search = config_parser.gmail_search_string(config)
     if g_search is None:
         logger.info("Search String is not valid. Unable to get messages.")
-        sys.exit(Errors.MISSING_GOOGLE_SEARCH_STRING)
+        sys.exit(ExitCodes.MISSING_GOOGLE_SEARCH_STRING)
     message_ids = gmail.get_message_ids(service, g_search)
-    if not found_messages(message_ids):
+    if not gmail.found_messages(message_ids):
         logger.debug("There were no messages.")
         logger.info("Ending cleanly with no messages to process")
-        sys.exit(Errors.OK)
+        sys.exit(ExitCodes.OK)
     list_of_message_ids = gmail.get_only_message_ids(message_ids)
     logger.debug(f"message_ids:\n\t{list_of_message_ids}\n")
     for message_id in list_of_message_ids:
@@ -215,8 +152,8 @@ def process(logger, line_token: str, processed_label: str):  # pylint: disable=t
             gmail.add_label_to_message(
                 service, message_id, processed_label)
             if config_parser.should_mail_be_archived(
-                config_parser.gmail_archive_setting(config),
-                config['services'][data['notifier']].get('archive')):
+                    config_parser.gmail_archive_setting(config),
+                    config['services'][data['notifier']].get('archive')):
                 gmail.archive_message(service, message_id)
             # End of the program
     logger.info("Ending cleanly")

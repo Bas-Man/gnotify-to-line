@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-Docment me
+This module provides functions for dealing with the config.toml file.
 """
 try:
     import tomllib
 except ModuleNotFoundError:
     import tomli as tomllib
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 
 
-def load_toml(config_file: Path) -> Dict[str,str]:
+def load_toml(config_file: Path) -> Dict[str, Any]:
     """
     Load the configuration file
     """
@@ -47,12 +47,24 @@ def senders_subjects(config) -> Tuple[List[str], List[str], Dict[str, str]]:
 
 def gmail_archive_setting(config) -> Optional[bool]:
     """
-    Document me
+    This function accesses the [gmail] archive setting.
+    :param config: Configuration afte being loaded.
+    :type config: dict
+    :return: True or False or None if there is not configuration value
+    :rtype: Optional[bools]
     """
     return config['gmail'].get('archive')
 
 def should_mail_be_archived(global_config: Optional[bool], sender_config: Optional[bool]) -> bool:
-    """ Document me
+    """
+    This function determines if the mail should be removed from the `INBOX` based on the
+    configuration settings combining [gmail] and [services.service_name]
+    :param global_config:
+    :type global_config: Optional[bool]
+    :param sender_config:
+    :type sender_config: Optional[bool]
+    :return: True or False
+    :rtype: bool
     """
     if sender_config is True:
         return True

@@ -1,11 +1,18 @@
 """
-Document me
+This module contains functions for building message strings based on the contents of `data`
 """
 from typing import Optional
 
 def call_function(name: Optional[str], data: dict) -> Optional[str]:
     """
-    Document me
+    Based on the value of the `key` 'notifier' the correct message building function
+    is called.
+    :param name: Name of the person who triggered the notification.
+    :type name: Optional[str]
+    :param data: A dictionary contain the information extracted from the email.
+    :type data: dict
+    :return: This returns None if the notifier is not supported or the formatted string.
+    :rtype: Optional[str]
     """
     func = globals().get(data['notifier'])
     if callable(func):
@@ -14,7 +21,9 @@ def call_function(name: Optional[str], data: dict) -> Optional[str]:
 
 def nichinoken(name: Optional[str], data: dict) -> str:
     """
-    Document me
+    This function builds the message string for a notification from Nichinoken.
+    :return: Nichinoken message string.
+    :rtype: str
     """
     return (
         f"Nichinoken Notification"
@@ -24,7 +33,9 @@ def nichinoken(name: Optional[str], data: dict) -> str:
 
 def train(name: Optional[str], data: dict) -> str:
     """
-    Document me
+    This function builds the message string for a notification from a train service
+    :return: Train notification message string
+    :rtype: str
     """
     if data['enterexit'] == "入場":
         status = "Entered"
@@ -39,7 +50,9 @@ def train(name: Optional[str], data: dict) -> str:
 
 def bus(name: Optional[str], data: dict) -> str:
     """
-    Document me
+    This function builds the message string for a bus notification.
+    :return: Bus notification message string.
+    :rtype: str
     """
     return (f"{name} boarded \n"
             f" the {data['busname']} bound for \n"
@@ -49,7 +62,9 @@ def bus(name: Optional[str], data: dict) -> str:
 
 def gate(name: Optional[str], data: dict) -> str:
     """
-    Document me
+    This message builds a notification from the School gate.
+    :return: School Gate notification message string
+    :rtype: str
     """
     return (f"{name} passed the school gate.\n"
             f"{data['date']} at {data['time']}"
@@ -57,7 +72,9 @@ def gate(name: Optional[str], data: dict) -> str:
 
 def kidzduo(name: Optional[str], data: dict) -> str:
     """
-    Document me
+    This function builds a notification message for KidsDuo
+    :return: KidzDuo notification message string
+    :rtype: str
     """
     return (
         f"KidzDuo Notification"
@@ -68,7 +85,9 @@ def kidzduo(name: Optional[str], data: dict) -> str:
 
 def tokyoinstitute(name: Optional[str], data: dict) -> str:
     """
-    Document me
+    Tokyo Institution
+    :return: Tokyo Institution notification message string
+    :rtype: str
     """
     return (
         f"{data['location']} Notification"
