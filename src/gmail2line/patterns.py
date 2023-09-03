@@ -6,7 +6,7 @@ function for handling pattern matching.
 import re
 from typing import Dict
 
-def findMatches(string, regex) -> Dict[str, str]:
+def find_matches(string, regex) -> Dict[str, str]:
     """
     This is a generic matching function.
     Warning! Your regex expression MUST use 'Named Groups' -> (?P<name>) or \
