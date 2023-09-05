@@ -32,8 +32,9 @@ def cli():
     Document me
     """
     parse = argparse.ArgumentParser()
-    parse.add_argument("-l", "--label")
-    parse.add_argument("-la", "--label-all", action='store_true')
+    parse.add_argument("-l", "--label", help="Lookup the ID for LABEL.")
+    parse.add_argument("-la", "--label-all", help="List all labels in Gmail.",action='store_true')
+    parse.add_argument("-ln", "--label-new", help="Register a new label with Gmail.", action='store_true')
     args = parse.parse_args()
 
     logger = glogger.setup_logging(CONFIG_DIR, config['log'].get('lvl'))
@@ -41,6 +42,8 @@ def cli():
         gmail.list_all_labels_and_ids(CONFIG_DIR, logger)
     elif args.label:
         gmail.lookup_label_id(CONFIG_DIR, logger, args)
+    elif args.label_new:
+        gmail.setup_new_label(gmail.get_service(CONFIG_DIR))
     else:
         # Default: Sanity check and call process()
         LABEL_ID = os.getenv("LABEL_ID")

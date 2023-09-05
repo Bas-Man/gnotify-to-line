@@ -12,6 +12,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from gmail2line import config_parser
 
 PICKLE = "token.pickle"
 
@@ -30,8 +31,8 @@ def get_service(config_dir: Path):
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    pickle_file = get_valid_path(config_dir, PICKLE)
-    credentials_json = get_valid_path(config_dir, '.credentials.json')
+    pickle_file = config_parser.get_valid_path(config_dir, PICKLE)
+    credentials_json = config_parser.get_valid_path(config_dir, 'credentials.json')
     if pickle_file is not None:
         with pickle_file.open("rb") as f:
             creds = pickle.load(f)
@@ -40,8 +41,6 @@ def get_service(config_dir: Path):
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            # I suspect that 'credentials_json' needs to be converted from \
-            # Path to str to work correctly?
             flow = InstalledAppFlow.from_client_secrets_file(
                 credentials_json, SCOPES)
             creds = flow.run_local_server(port=0)
@@ -55,30 +54,6 @@ def get_service(config_dir: Path):
     # return build('gmail', 'v1', credentials=creds, cache_discovery=False)
     return build('gmail', 'v1', credentials=creds)
 
-def get_valid_path(config_dir: Path, filename: str) -> Optional[Path]:
-    """
-    Looks in the current working directory and the `config_dir` to find the provided
-    filename. Returns the first valid path found.
-
-    :param config_dir: Provided configuration directory.
-    :type config_dir: Path
-    :param filename: Name of the file to check for.
-    :type filename: str
-    :return: Returns the path found if it exists or None if no filename.
-    :rtype: Optional[Path]
-    """
-    # Check if file exists in the current directory
-    current_dir_path = Path.cwd() / filename
-    if current_dir_path.exists():
-        return current_dir_path
-
-    # Check if file exists in ~/.config/somedir/
-    config_path = config_dir / filename
-    if config_path.exists():
-        return config_path
-
-    # If file is not found, return None
-    return None
 
 def get_only_message_ids(message_ids) -> list:
     """
@@ -103,9 +78,29 @@ def get_labels(service) -> List[Dict[str,str]]:
     return list_of_labels.get('labels')
 
 
-def update_messsage_labels(service, msg_id: str, add_labels: List[str], remove_labels: List[str]):
+def setup_new_label(service) -> None:
+    label_name: str = input("Enter new Label Name: ").strip()
+    # Check that label does not already exist. If it does. Return the label ID
+    # If it does not exist. Create the new label and register it with Gmail and return the newly create ID.
+    print(f"Checking if {label_name} is already registered with account.")
+    list_of_labels = get_labels(service)
+    label_id = get_label_id_from_list(list_of_labels, label_name)
+    if label_id is not None:
+        print(f"Label already registered in Gmail.")
+        print(f"Label: {label_name} -> Label ID: {label_id}")
+    else:
+        print("No label registered in Gmail.")
+        print("Creating new label request.")
+        new_label = define_label(label_name)
+        print(f"Registering Label: {label_name} with Gmail.")
+        registered_label = register_label_with_gmail(service, new_label)
+        print("New label registered.")
+        print(f"Label: {label_name} has Gmail ID: {get_label_id(registered_label)}")
+
+def update_messsage_labels(service, msg_id: str, add_labels: Optional[List[str]] = None,
+                           remove_labels: Optional[List[str]] = None) -> str:
     """
-    Document me more
+    Convinence method to allow you to add and or remove multiple labels in a single call.
 
     :param service: Gmail service connection object
     :type service:
@@ -118,6 +113,12 @@ def update_messsage_labels(service, msg_id: str, add_labels: List[str], remove_l
     :returns: msg:
     :rtype: str
     """
+
+    if add_labels is None:
+        add_labels = []
+    if remove_labels is None:
+        remove_labels = []
+
     msg = service.users().messages().modify(userId='me',
                                             id=msg_id,
                                             body={'removeLabelIds': remove_labels,
@@ -128,7 +129,7 @@ def update_messsage_labels(service, msg_id: str, add_labels: List[str], remove_l
 
 def add_label_to_message(service, msg_id: str, label_id: str) -> str:
     """
-    Add gmail label to given message.
+    Add the provided label ID string to the Gmail message.
 
     :param service: Gmail service connection object
     :type service:
@@ -192,7 +193,7 @@ def lookup_label_id(config_dir, logger, args) -> None:
     logger.info("Finished looking up Label ID.")
 
 
-def define_label(name, mlv="show", llv="labelShow") -> dict:
+def define_label(name: str, mlv: str ="show", llv: str ="labelShow") -> dict:
     """
     Define a new label for gmail.
 

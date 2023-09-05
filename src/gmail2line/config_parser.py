@@ -28,6 +28,31 @@ def gmail_search_string(config: Dict) -> Optional[str]:
     """
     return config['gmail'].get('search')
 
+def get_valid_path(config_dir: Path, filename: str) -> Optional[Path]:
+    """
+    Looks in the current working directory and the `config_dir` to find the provided
+    filename. Returns the first valid path found.
+
+    :param config_dir: Provided configuration directory.
+    :type config_dir: Path
+    :param filename: Name of the file to check for.
+    :type filename: str
+    :return: Returns the path found if it exists or None if no filename.
+    :rtype: Optional[Path]
+    """
+    # Check if file exists in the current directory
+    current_dir_path = Path.cwd() / filename
+    if current_dir_path.exists():
+        return current_dir_path
+
+    # Check if file exists in ~/.config/somedir/
+    config_path = config_dir / filename
+    if config_path.exists():
+        return config_path
+
+    # If file is not found, return None
+    return None
+
 
 def senders_subjects(config: Dict) -> Tuple[List[str], List[str], Dict[str, str]]:
     """
