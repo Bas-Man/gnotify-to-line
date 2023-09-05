@@ -10,6 +10,7 @@ LOG_FILE = "gnotifier.log"
 def setup_logging(config_dir: Path, level: str):
     """
     Setup logging for applciation.
+
     :param config_dir: Path to the config directory where the log will also be written.
     :type config_dir: Path
     :param level: The Level that logger should run at. Values can be \

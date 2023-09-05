@@ -19,8 +19,7 @@ def find_matches(string, regex) -> Dict[str, str]:
     :returns: A dictionary of named key/value pairs. The key value is derived \
     from (?P<name>)
     :returns: None is returned if No match is found.
-    :rtype: dict
-    :rtype: None
+    :rtype: dict | None
     """
     match = re.search(regex, string, re.UNICODE | re.MULTILINE)
     if match:

@@ -63,6 +63,7 @@ def handle_each_email(service, message_id, logger) -> dict:
     """
     Process each message and extract who the notifier is as well as the data
     in the body of the email
+
     :param service: Gmail API connection
     :type service: object
     :param message_id: The id of the message to be processed.
@@ -138,7 +139,9 @@ def process(logger, line_token: str, processed_label: str):  # pylint: disable=t
             line.send_notification(message, line_token)
             processed = True
         else:
-            logger.info(f"Caller: {data['notifier']} is not a callable function.")
+            logger.info(
+                f"Caller: {data['notifier']} is not a callable function."
+                )
 
         if data.get("notifier") is None and data is not None:
             logger.warning("Subject matched but From was not matched")

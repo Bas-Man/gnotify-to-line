@@ -1,0 +1,175 @@
+2022-03-29 15:25:42,607 - INFO - Looking for email for notification
+2022-03-29 15:25:43,474 - INFO - Ending cleanly with no messages to process
+2022-03-29 15:36:50,049 - INFO - Looking for email for notification
+2022-03-29 15:36:51,743 - INFO - This is not a notifcation.
+2022-03-29 15:38:03,386 - INFO - Looking for email for notification
+2022-03-29 15:38:04,548 - INFO - Ending cleanly with no messages to process
+2022-03-29 15:38:51,196 - INFO - Looking for email for notification
+2022-03-29 15:38:52,586 - INFO - This is not a notifcation.
+2022-03-29 15:39:15,959 - INFO - Looking for email for notification
+2022-03-29 15:39:17,162 - INFO - This is not a notifcation.
+2022-03-30 09:23:42,434 - INFO - Looking for email for notification
+2022-03-30 09:23:44,097 - WARNING - Failed to process message_id: 17fd81990a80e64e Matched Subject: 日能研パス・サイン　メール送信 Sender not matched: myn@nichinoken.co.jp
+2022-03-30 09:23:44,097 - INFO - Non-Notification email from expected sender
+2022-03-30 09:23:44,496 - WARNING - Failed to process message_id: 17fd3fecf4ea319b Matched Subject: 日能研パス・サイン　メール送信 Sender not matched: myn@nichinoken.co.jp
+2022-03-30 09:23:44,496 - INFO - Non-Notification email from expected sender
+2022-03-30 09:23:44,497 - INFO - Ending cleanly
+2022-03-30 09:28:56,091 - INFO - Looking for email for notification
+2022-03-30 09:28:58,024 - INFO - Ending cleanly
+2022-03-30 09:30:32,186 - INFO - Looking for email for notification
+2022-03-30 09:30:33,996 - INFO - Ending cleanly
+2022-03-30 09:32:59,187 - INFO - Looking for email for notification
+2022-03-30 09:34:47,808 - INFO - Looking for email for notification
+2022-03-30 09:35:35,924 - INFO - Looking for email for notification
+2022-03-30 09:36:42,611 - INFO - Looking for email for notification
+2022-03-30 09:36:44,475 - INFO - Ending cleanly
+2022-03-30 09:37:39,708 - INFO - Looking for email for notification
+2022-03-30 09:38:01,353 - INFO - Looking for email for notification
+2022-03-30 10:06:10,498 - INFO - Looking for email for notification
+2022-03-30 10:07:41,617 - INFO - Looking for email for notification
+2022-03-30 10:07:59,882 - INFO - Looking for email for notification
+2022-03-30 10:08:01,705 - INFO - Ending cleanly
+2022-03-30 10:08:57,167 - INFO - Looking for email for notification
+2022-03-30 10:08:59,562 - INFO - Ending cleanly
+2022-03-30 10:12:07,506 - INFO - Looking for email for notification
+2022-03-30 10:12:10,878 - INFO - Ending cleanly
+2022-03-30 10:15:42,713 - INFO - Looking for email for notification
+2022-03-30 10:15:43,823 - INFO - Ending cleanly with no messages to process
+2022-04-03 12:45:05,624 - INFO - Looking for email for notification
+2022-04-03 12:45:09,268 - INFO - Ending cleanly
+2022-04-08 11:04:39,239 - INFO - Looking for email for notification
+2022-04-08 11:04:40,502 - INFO - Ending cleanly with no messages to process
+2022-04-08 12:48:17,924 - INFO - Looking for email for notification
+2022-04-08 12:48:19,052 - INFO - Ending cleanly with no messages to process
+2023-04-17 16:25:09,583 - INFO - Looking for email for notification
+2023-04-17 16:25:10,668 - INFO - Ending cleanly with no messages to process
+2023-04-18 14:51:51,158 - INFO - Looking for email for notification
+2023-04-18 14:57:59,837 - INFO - Looking for email for notification
+2023-04-18 15:04:52,778 - INFO - Looking for email for notification
+2023-04-18 15:05:43,588 - INFO - Looking for email for notification
+2023-04-18 15:08:33,072 - INFO - Looking for email for notification
+2023-04-18 15:10:22,278 - INFO - Looking for email for notification
+2023-04-18 15:13:01,704 - INFO - Looking for email for notification
+2023-04-18 15:17:26,861 - INFO - Looking for email for notification
+2023-04-18 15:17:28,097 - INFO - Ending cleanly with no messages to process
+2023-04-22 13:04:57,710 - INFO - Looking for email for notification
+2023-04-22 13:05:01,015 - INFO - Ending cleanly
+2023-05-02 16:34:04,534 - INFO - Looking for email for notification
+2023-05-02 16:34:05,847 - INFO - Ending cleanly with no messages to process
+2023-05-09 11:26:17,337 - INFO - Looking for email for notification
+2023-05-09 11:26:18,543 - INFO - Ending cleanly with no messages to process
+2023-05-09 11:28:11,995 - INFO - Looking for email for notification
+2023-05-09 11:28:12,760 - INFO - Ending cleanly with no messages to process
+2023-05-09 11:28:24,874 - INFO - Looking for email for notification
+2023-05-09 11:28:25,618 - INFO - Ending cleanly with no messages to process
+2023-05-09 14:09:53,503 - INFO - Looking for email for notification
+2023-05-09 14:09:54,787 - INFO - Ending cleanly with no messages to process
+2023-05-09 14:25:44,600 - INFO - Looking for email for notification
+2023-05-09 14:25:45,686 - INFO - Ending cleanly with no messages to process
+2023-05-11 09:40:43,618 - INFO - Looking for email for notification
+2023-05-17 15:00:42,902 - INFO - Looking for email for notification
+2023-05-17 15:00:43,900 - INFO - Ending cleanly with no messages to process
+2023-05-23 13:38:09,498 - INFO - Looking for email for notification
+2023-05-23 13:42:16,476 - INFO - Looking for email for notification
+2023-05-23 13:42:17,305 - INFO - Ending cleanly with no messages to process
+2023-05-23 13:44:36,466 - INFO - Looking for email for notification
+2023-05-23 13:49:34,526 - INFO - Looking for email for notification
+2023-05-23 13:59:43,851 - INFO - Looking for email for notification
+2023-05-23 14:03:36,244 - INFO - Looking for email for notification
+2023-05-23 14:05:33,707 - INFO - Looking for email for notification
+2023-05-23 14:05:34,480 - INFO - Ending cleanly with no messages to process
+2023-05-23 14:09:23,702 - INFO - Looking for email for notification
+2023-05-23 14:09:57,604 - INFO - Looking for email for notification
+2023-05-23 14:12:37,691 - INFO - Looking for email for notification
+2023-05-23 14:12:38,575 - INFO - Ending cleanly with no messages to process
+2023-05-23 14:14:22,636 - INFO - Looking up all Labels and IDs
+2023-05-23 14:14:23,669 - INFO - Finished lookup all Labels and IDs
+2023-05-23 14:16:37,243 - INFO - Looking up all Labels and IDs
+2023-05-23 14:16:38,219 - INFO - Finished lookup all Labels and IDs
+2023-05-23 14:16:44,303 - INFO - Looking up Label ID for Label: Australia
+2023-05-23 14:17:06,770 - INFO - Looking up Label ID for Label: Australia
+2023-05-23 14:17:07,503 - INFO - Finished looking up Label ID.
+2023-05-23 14:23:08,624 - INFO - Looking up Label ID for Label: Australia
+2023-05-23 14:23:09,520 - INFO - Finished looking up Label ID.
+2023-05-23 14:23:15,896 - INFO - Looking up all Labels and IDs
+2023-05-23 14:23:16,612 - INFO - Finished lookup all Labels and IDs
+2023-05-23 14:30:21,401 - INFO - Looking for email for notification
+2023-05-23 14:30:22,102 - INFO - Ending cleanly with no messages to process
+2023-08-07 14:47:14,760 - INFO - Looking for email for notification
+2023-08-07 14:48:35,881 - INFO - Looking for email for notification
+2023-08-07 14:53:36,986 - INFO - Looking for email for notification
+2023-08-07 14:57:56,683 - INFO - Looking for email for notification
+2023-08-07 15:01:15,451 - INFO - Looking for email for notification
+2023-08-07 15:08:50,455 - INFO - Looking for email for notification
+2023-08-07 16:49:07,456 - INFO - Looking for email for notification
+2023-08-07 16:50:30,797 - INFO - Looking for email for notification
+2023-08-07 16:50:42,193 - INFO - Looking for email for notification
+2023-08-07 16:52:07,514 - INFO - Looking for email for notification
+2023-08-07 16:52:45,191 - INFO - Looking for email for notification
+2023-08-07 16:54:06,955 - INFO - Looking for email for notification
+2023-08-07 16:55:45,367 - INFO - Looking for email for notification
+2023-08-07 16:56:19,272 - INFO - Looking for email for notification
+2023-08-07 16:56:22,522 - INFO - Ending cleanly
+2023-08-07 16:59:40,645 - INFO - Looking for email for notification
+2023-08-07 16:59:41,582 - INFO - Ending cleanly with no messages to process
+2023-08-07 17:00:05,379 - INFO - Looking for email for notification
+2023-08-07 17:00:06,364 - INFO - Ending cleanly with no messages to process
+2023-08-07 17:03:53,897 - INFO - Looking for email for notification
+2023-08-07 17:03:54,708 - INFO - Ending cleanly with no messages to process
+2023-08-08 14:37:08,522 - INFO - Looking for email for notification
+2023-08-08 14:37:11,075 - INFO - Ending cleanly
+2023-08-08 14:42:29,480 - INFO - Looking for email for notification
+2023-08-08 14:42:30,249 - INFO - Ending cleanly with no messages to process
+2023-08-08 14:45:42,198 - INFO - Looking for email for notification
+2023-08-08 14:45:43,167 - INFO - Ending cleanly with no messages to process
+2023-08-08 14:47:29,692 - INFO - Looking for email for notification
+2023-08-08 14:49:05,702 - INFO - Looking for email for notification
+2023-08-08 14:49:06,530 - INFO - Ending cleanly with no messages to process
+2023-08-08 14:50:50,175 - INFO - Looking for email for notification
+2023-08-08 14:50:50,978 - INFO - Ending cleanly with no messages to process
+2023-08-08 14:52:21,696 - INFO - Looking for email for notification
+2023-08-08 14:52:22,488 - INFO - Ending cleanly with no messages to process
+2023-08-08 14:53:00,341 - INFO - Looking for email for notification
+2023-08-08 14:54:26,745 - INFO - Looking for email for notification
+2023-08-08 14:56:50,663 - INFO - Looking for email for notification
+2023-08-08 14:59:13,704 - INFO - Looking for email for notification
+2023-08-08 15:02:09,017 - INFO - Looking for email for notification
+2023-08-08 15:03:30,409 - INFO - Looking for email for notification
+2023-08-08 15:03:31,273 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:05:12,113 - INFO - Looking for email for notification
+2023-08-08 15:05:50,190 - INFO - Looking for email for notification
+2023-08-08 15:06:54,031 - INFO - Looking for email for notification
+2023-08-08 15:06:54,962 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:08:21,020 - INFO - Looking for email for notification
+2023-08-08 15:08:21,786 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:10:09,391 - INFO - Looking for email for notification
+2023-08-08 15:10:10,436 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:12:38,165 - INFO - Looking for email for notification
+2023-08-08 15:12:39,108 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:14:13,178 - INFO - Looking for email for notification
+2023-08-08 15:14:14,238 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:15:48,970 - INFO - Looking for email for notification
+2023-08-08 15:15:49,777 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:16:44,416 - INFO - Looking for email for notification
+2023-08-08 15:16:45,175 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:20:25,159 - INFO - Looking for email for notification
+2023-08-08 15:20:25,948 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:21:22,574 - INFO - Looking for email for notification
+2023-08-08 15:21:23,394 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:22:36,943 - INFO - Looking for email for notification
+2023-08-08 15:23:09,854 - INFO - Looking for email for notification
+2023-08-08 15:23:10,609 - INFO - Ending cleanly with no messages to process
+2023-08-08 15:24:38,124 - INFO - Looking for email for notification
+2023-08-08 15:24:38,835 - INFO - Ending cleanly with no messages to process
+2023-08-08 16:23:43,722 - INFO - Looking for email for notification
+2023-08-08 16:23:44,742 - INFO - Ending cleanly with no messages to process
+2023-08-08 16:25:04,561 - INFO - Looking up all Labels and IDs
+2023-08-08 16:25:05,433 - INFO - Finished lookup all Labels and IDs
+2023-08-08 16:25:35,109 - INFO - Looking up Label ID for Label: Draft
+2023-08-08 16:25:35,945 - INFO - Finished looking up Label ID.
+2023-08-08 16:27:45,830 - INFO - Looking for email for notification
+2023-08-08 16:27:46,909 - INFO - Ending cleanly with no messages to process
+2023-08-09 18:11:07,764 - INFO - Looking for email for notification
+2023-08-09 18:11:10,325 - INFO - Ending cleanly
+2023-08-09 18:56:04,684 - INFO - Looking for email for notification
+2023-08-09 18:56:05,548 - INFO - Ending cleanly with no messages to process

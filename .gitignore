@@ -2,12 +2,11 @@ __pycache__/*
 token.pickle
 credentials.json
 .python-version
-secrets.py
-search
-*.log
 .DS_Store
 .env
 .envrc
 __pycache__
 src/gmail2line.egg-info
 src/gmail2line/__pycache__/**
+docs
+.pytest_cache

@@ -22,6 +22,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.modify',
 def get_service(config_dir: Path):
     """
     Connect to the Gmail API.
+
     :return: Return a connection to the Google API Service.
     :rtype object:
     """
@@ -58,6 +59,7 @@ def get_valid_path(config_dir: Path, filename: str) -> Optional[Path]:
     """
     Looks in the current working directory and the `config_dir` to find the provided
     filename. Returns the first valid path found.
+
     :param config_dir: Provided configuration directory.
     :type config_dir: Path
     :param filename: Name of the file to check for.
@@ -91,6 +93,7 @@ def get_only_message_ids(message_ids) -> list:
 def get_labels(service) -> List[Dict[str,str]]:
     """
     Get all gmail labels.
+
     :param service: Gmail service connection object
     :type service: Object
     :return: List of Gmail Labels
@@ -103,14 +106,15 @@ def get_labels(service) -> List[Dict[str,str]]:
 def add_label_to_message(service, msg_id: str, label_id: str) -> str:
     """
     Add gmail label to given message.
+
     :param service: Gmail service connection object
     :type service:
     :param msg_id: message identifier
     :type msg_id: str
     :param label_id: Label to be applied to message
     :type label_id: str
-    :return: msg:
-    :rtype str:
+    :returns: msg:
+    :rtype: str
     """
     msg = service.users().messages().modify(userId='me',
                                             id=msg_id,
@@ -122,7 +126,8 @@ def add_label_to_message(service, msg_id: str, label_id: str) -> str:
 def list_all_labels_and_ids(config_dir, logger) -> None:
     """
     Displays all Gmail Labels found.
-    :rtype None:
+
+    :rtype: None
     """
     logger.info("Looking up all Labels and IDs")
     service = get_service(config_dir)
@@ -134,7 +139,8 @@ def list_all_labels_and_ids(config_dir, logger) -> None:
 def lookup_label_id(config_dir, logger, args) -> None:
     """
     Look up the Internal Gmail ID label for the user defined label provided.
-    :rtype None:
+
+    :rtype: None
     """
     logger.info(f"Looking up Label ID for Label: {args.label}")
     service = get_service(config_dir)
@@ -147,11 +153,12 @@ def lookup_label_id(config_dir, logger, args) -> None:
 def archive_message(service, msg_id) -> str:
     """
     Remove the 'INBOX' label from the provided message identifier
+
     :param service: Gmail service connection object
     :type service:
     :param msg_id: message identifier
     :type msg_id: str
-    :return: msg
+    :returns: msg
     """
     msg = service.users().messages().modify(userId='me',
                                             id=msg_id,
@@ -164,13 +171,14 @@ def archive_message(service, msg_id) -> str:
 def define_label(name, mlv="show", llv="labelShow") -> dict:
     """
     Define a new label for gmail.
+
     :param name: Name of new label
     :type name: str
     :param mlv:
     :type mlv: str
     :param llv:
     :type llv: str
-    :return: a new label
+    :returns: a new label
     :rtype: dict
     """
     label = {}
@@ -183,11 +191,12 @@ def define_label(name, mlv="show", llv="labelShow") -> dict:
 def register_label_with_gmail(service, label) -> dict:
     """
     Register the provide label with the gmail system.
+
     :param service: The gmail service
     :type service: object
     :param label: Label to be registered
     :type label: dict
-    :return: The label and associated details from gmail.
+    :returns: The label and associated details from gmail.
     :rtype: dict
     """
     created_label = service.users().labels().create(userId='me',
@@ -198,9 +207,10 @@ def register_label_with_gmail(service, label) -> dict:
 def get_label_id(label) -> str:
     """
     Obtain new label using ID.
+
     :param label: Gmail label
     :type label: dict
-    :return: The ID of the label passed in to the function
+    :returns: The ID of the label passed in to the function
     :rtype: str
     """
     return label.get('id')
@@ -237,11 +247,12 @@ def get_folders(service, logger):
 def get_message_ids(service, search_string: str) -> dict:
     """
     Searchs Gmail for any messages that match the search string provided.
+
     :param service: The Gmail API connection.
     :type service: object
     :param search_string: The Gmail search string to use.
     :type search_string: str
-    :return: A dictionary of messages that match the search string.
+    :returns: A dictionary of messages that match the search string.
     :rytpe: dict
     """
     message_ids = service.users().messages().list(userId='me',
@@ -251,13 +262,14 @@ def get_message_ids(service, search_string: str) -> dict:
 def get_message(service, msg_id: str, logger) -> Optional[email.message.EmailMessage]:
     """
     Retrive the email message assicated with the given msg_id
+
     :param service: Gmail API connection
     :type service: object
     :param msg_id: The id for the requested message.
     :type msg_id: str
     :param logger: Logger to pass information.
     :type logger: object
-    :return: The Email message referenced by mss_id
+    :returns: The Email message referenced by mss_id
     :rtype: email.message.EmailMessage
     """
     try:
@@ -278,6 +290,7 @@ def get_message(service, msg_id: str, logger) -> Optional[email.message.EmailMes
 def found_messages(message_ids) -> bool:
     """
     Return a boolean to indicate if any message have been found.
+
     :param message_ids:
     :rtype: bool
     """

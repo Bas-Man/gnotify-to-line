@@ -48,6 +48,7 @@ def senders_subjects(config) -> Tuple[List[str], List[str], Dict[str, str]]:
 def gmail_archive_setting(config) -> Optional[bool]:
     """
     This function accesses the [gmail] archive setting.
+
     :param config: Configuration afte being loaded.
     :type config: dict
     :return: True or False or None if there is not configuration value
@@ -59,6 +60,7 @@ def should_mail_be_archived(global_config: Optional[bool], sender_config: Option
     """
     This function determines if the mail should be removed from the `INBOX` based on the
     configuration settings combining [gmail] and [services.service_name]
+
     :param global_config:
     :type global_config: Optional[bool]
     :param sender_config:
