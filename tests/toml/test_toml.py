@@ -40,3 +40,18 @@ def test_gmail_true_from_config():
     assert config_parser.gmail_archive_setting(config) is not None
     assert config_parser.gmail_archive_setting(config) is True
     assert config_parser.should_mail_be_archived(config_parser.gmail_archive_setting(config), None) == True
+
+def test_service_archive_settings_bus_true():
+    config_path = Path.cwd() / "tests" / "toml" / "config.toml"
+    config = config_parser.load_toml(config_path)
+    assert config_parser.service_archive_settings(config, 'bus') == True
+
+def test_service_archive_settings_train_none():
+    config_path = Path.cwd() / "tests" / "toml" / "config.toml"
+    config = config_parser.load_toml(config_path)
+    assert config_parser.service_archive_settings(config, 'train') == None
+
+def test_service_archive_settings_tokyoinstitute_false():
+    config_path = Path.cwd() / "tests" / "toml" / "config.toml"
+    config = config_parser.load_toml(config_path)
+    assert config_parser.service_archive_settings(config, 'tokyoinstitute') == False

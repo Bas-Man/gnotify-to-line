@@ -156,7 +156,9 @@ def process(logger, line_token: str, processed_label: str):  # pylint: disable=t
                 service, message_id, processed_label)
             if config_parser.should_mail_be_archived(
                     config_parser.gmail_archive_setting(config),
-                    config['services'][data['notifier']].get('archive')):
+                    config_parser.service_archive_settings(
+                        config, data['notifier'])
+            ):
                 gmail.archive_message(service, message_id)
             # End of the program
     logger.info("Ending cleanly")

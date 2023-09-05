@@ -22,14 +22,14 @@ def load_toml(config_file: Path) -> Dict[str, Any]:
         config = {}
     return config
 
-def gmail_search_string(config) -> Optional[str]:
+def gmail_search_string(config: Dict) -> Optional[str]:
     """
     Give easy access to the Gmail Search string.
     """
     return config['gmail'].get('search')
 
 
-def senders_subjects(config) -> Tuple[List[str], List[str], Dict[str, str]]:
+def senders_subjects(config: Dict) -> Tuple[List[str], List[str], Dict[str, str]]:
     """
     Docuemnt me
     """
@@ -45,7 +45,7 @@ def senders_subjects(config) -> Tuple[List[str], List[str], Dict[str, str]]:
                 subjects.append(subject)
     return (senders, subjects, sender_as_key)
 
-def gmail_archive_setting(config) -> Optional[bool]:
+def gmail_archive_setting(config: Dict) -> Optional[bool]:
     """
     This function accesses the [gmail] archive setting.
 
@@ -55,6 +55,10 @@ def gmail_archive_setting(config) -> Optional[bool]:
     :rtype: Optional[bools]
     """
     return config['gmail'].get('archive')
+
+def service_archive_settings(config: Dict, config_service: str) -> Optional[bool]:
+    return config['services'][config_service].get('archive')
+
 
 def should_mail_be_archived(global_config: Optional[bool], sender_config: Optional[bool]) -> bool:
     """

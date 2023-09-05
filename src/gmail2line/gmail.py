@@ -103,6 +103,29 @@ def get_labels(service) -> List[Dict[str,str]]:
     return list_of_labels.get('labels')
 
 
+def update_messsage_labels(service, msg_id: str, add_labels: List[str], remove_labels: List[str]):
+    """
+    Document me more
+
+    :param service: Gmail service connection object
+    :type service:
+    :param msg_id: message identifier
+    :type msg_id: str
+    :param add_labes: A list of labels to be added to the msg_id
+    :type add_label: List[str]
+    :param remove_labels: A list of labels to be removed from the msg_id
+    :type remove_labels: List[str]
+    :returns: msg:
+    :rtype: str
+    """
+    msg = service.users().messages().modify(userId='me',
+                                            id=msg_id,
+                                            body={'removeLabelIds': remove_labels,
+                                                  'addLabelIds': add_labels}
+                                            ).execute()
+    return msg
+
+
 def add_label_to_message(service, msg_id: str, label_id: str) -> str:
     """
     Add gmail label to given message.
@@ -122,6 +145,24 @@ def add_label_to_message(service, msg_id: str, label_id: str) -> str:
                                                   'addLabelIds': [label_id]}
                                             ).execute()
     return msg
+
+def archive_message(service, msg_id) -> str:
+    """
+    Remove the 'INBOX' label from the provided message identifier
+
+    :param service: Gmail service connection object
+    :type service:
+    :param msg_id: message identifier
+    :type msg_id: str
+    :returns: msg
+    """
+    msg = service.users().messages().modify(userId='me',
+                                            id=msg_id,
+                                            body={'removeLabelIds': ['INBOX'],
+                                                  'addLabelIds': []}
+                                            ).execute()
+    return msg
+
 
 def list_all_labels_and_ids(config_dir, logger) -> None:
     """
@@ -149,23 +190,6 @@ def lookup_label_id(config_dir, logger, args) -> None:
     label_id = get_label_id_from_list(labels, args.label)
     print(f"ID for label: {args.label} -> ID: {label_id}")
     logger.info("Finished looking up Label ID.")
-
-def archive_message(service, msg_id) -> str:
-    """
-    Remove the 'INBOX' label from the provided message identifier
-
-    :param service: Gmail service connection object
-    :type service:
-    :param msg_id: message identifier
-    :type msg_id: str
-    :returns: msg
-    """
-    msg = service.users().messages().modify(userId='me',
-                                            id=msg_id,
-                                            body={'removeLabelIds': ['INBOX'],
-                                                  'addLabelIds': []}
-                                            ).execute()
-    return msg
 
 
 def define_label(name, mlv="show", llv="labelShow") -> dict:

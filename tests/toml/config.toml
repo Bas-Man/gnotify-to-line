@@ -36,3 +36,4 @@ archive = false
   sender = "東京個別指導学院 <oshirase@tkg-jp.com>"
   subjects = ["退室のご連絡", "入室のご連絡" ]
   regex = 'スパン 碧桜アイビーローズ さんが\s(?:\d{4}年)(?P<date>(?:\d{2}(?:[一-龯])\d{2}(?:[一-龯])\s\d{2}(?:[一-龯])\d{2}(?:[一-龯])))\s(?P<enterexit>(?:に入室しました)|(?:に退室しました))。（(?P<location>(?:[一-龯]+))）'
+  archive = false
