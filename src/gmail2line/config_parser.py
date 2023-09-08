@@ -15,8 +15,8 @@ def load_toml(config_file: Path) -> Dict[str, Any]:
     Load the configuration file
     """
     try:
-        with open(config_file, mode="rb") as fp:
-            config: Dict[str, str] = tomllib.load(fp)
+        with open(config_file, mode="rb") as file:
+            config: Dict[str, str] = tomllib.load(file)
     except FileNotFoundError:
         print(f"Config file: {config_file} not found")
         config = {}
@@ -70,6 +70,21 @@ def senders_subjects(config: Dict) -> Tuple[List[str], List[str], Dict[str, str]
                 subjects.append(subject)
     return (senders, subjects, sender_as_key)
 
+def build_name_lookup(config: Dict) -> Optional[Dict[str, str]]:
+    name_lookup_idx: Dict[str, str] = {}
+    if 'people' in config:
+        for name, name_list in config['people'].items():
+            aliases = name_list.get('names')
+            for alias in aliases:
+                name_lookup_idx[alias] = name.capitalize()
+
+    return name_lookup_idx
+
+def lookup_name(name_lookup_idx: Dict[str, str], alias: Optional[str]) -> Optional[str]:
+    if alias is None:
+        return None
+    return name_lookup_idx.get(alias)
+
 def gmail_archive_setting(config: Dict) -> Optional[bool]:
     """
     This function accesses the [gmail] archive setting.
@@ -82,6 +97,13 @@ def gmail_archive_setting(config: Dict) -> Optional[bool]:
     return config['gmail'].get('archive')
 
 def service_archive_settings(config: Dict, config_service: str) -> Optional[bool]:
+    """
+    If the service is defined in the config and has an 'archive' option this value will be returned.
+    :param config: reference to the service archive setting.
+    :type: dict
+    :Returns: None or the value stored in the option.
+    :rtype: Optional[bool]
+    """
     return config['services'][config_service].get('archive')
 
 
@@ -107,9 +129,11 @@ if __name__ == '__main__':
     from pprint import pprint
     path = Path.home() / ".config" / "gmail-notify" / "config.toml"
     options = load_toml(path)
+    print("All Data")
     pprint(options)
 
     gsearch = gmail_search_string(options)
+    print("GSearch")
     pprint(gsearch)
     senders, subjects, sender_key = senders_subjects(options)
     pprint(senders)

@@ -10,3 +10,5 @@ src/gmail2line.egg-info
 src/gmail2line/__pycache__/**
 docs
 .pytest_cache
+.vscode
+pyrightconfig.json

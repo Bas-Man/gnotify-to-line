@@ -1,69 +1,8 @@
 """
-Document me
+This module handles labeling issues with Gmail.
 """
-import pickle
-from pathlib import Path
 from typing import Dict, List, Optional
-import base64
-import email
-from email import parser
-from email import policy
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from gmail2line import config_parser
-
-PICKLE = "token.pickle"
-
-# If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/gmail.modify',
-          'https://www.googleapis.com/auth/gmail.labels']
-
-def get_service(config_dir: Path):
-    """
-    Connect to the Gmail API.
-
-    :return: Return a connection to the Google API Service.
-    :rtype object:
-    """
-    creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    pickle_file = config_parser.get_valid_path(config_dir, PICKLE)
-    credentials_json = config_parser.get_valid_path(config_dir, 'credentials.json')
-    if pickle_file is not None:
-        with pickle_file.open("rb") as f:
-            creds = pickle.load(f)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                credentials_json, SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        # If there is no pickle file we store it in the .config/app directory
-        if pickle_file is None:
-            pickle_file = config_dir / PICKLE
-        with pickle_file.open('wb') as token:
-            pickle.dump(creds, token)
-    # Another option to ignore google cache logging issue
-    # return build('gmail', 'v1', credentials=creds, cache_discovery=False)
-    return build('gmail', 'v1', credentials=creds)
-
-
-def get_only_message_ids(message_ids) -> list:
-    """
-    Document me
-    """
-    ids = []
-    for message_id in message_ids['messages']:
-        ids.append(message_id['id'])
-    return ids
-
 
 def get_labels(service) -> List[Dict[str,str]]:
     """
@@ -79,14 +18,21 @@ def get_labels(service) -> List[Dict[str,str]]:
 
 
 def setup_new_label(service) -> None:
+    """
+    This function takes you through the process of creating and setting
+    up a new label with Gmail.
+    :param service: Gmail Service connection
+    :returns: None
+    """
     label_name: str = input("Enter new Label Name: ").strip()
     # Check that label does not already exist. If it does. Return the label ID
-    # If it does not exist. Create the new label and register it with Gmail and return the newly create ID.
+    # If it does not exist. Create the new label and register it with Gmail and
+    #  return the newly create ID.
     print(f"Checking if {label_name} is already registered with account.")
     list_of_labels = get_labels(service)
     label_id = get_label_id_from_list(list_of_labels, label_name)
     if label_id is not None:
-        print(f"Label already registered in Gmail.")
+        print("Label already registered in Gmail.")
         print(f"Label: {label_name} -> Label ID: {label_id}")
     else:
         print("No label registered in Gmail.")
@@ -165,27 +111,25 @@ def archive_message(service, msg_id) -> str:
     return msg
 
 
-def list_all_labels_and_ids(config_dir, logger) -> None:
+def list_all_labels_and_ids(service, logger) -> None:
     """
     Displays all Gmail Labels found.
 
     :rtype: None
     """
     logger.info("Looking up all Labels and IDs")
-    service = get_service(config_dir)
     labels = get_labels(service)
     for label in labels:
         print(f"Label: {label.get('name')} -> ID: {label.get('id')}")
     logger.info("Finished lookup all Labels and IDs")
 
-def lookup_label_id(config_dir, logger, args) -> None:
+def lookup_label_id(service, logger, args) -> None:
     """
     Look up the Internal Gmail ID label for the user defined label provided.
 
     :rtype: None
     """
     logger.info(f"Looking up Label ID for Label: {args.label}")
-    service = get_service(config_dir)
     print(f"Looking for label {args.label}")
     labels = get_labels(service)
     label_id = get_label_id_from_list(labels, args.label)
@@ -265,58 +209,5 @@ def get_folders(service, logger):
             for label in labels:
                 logger.info(label['name'])
 
-    except HttpError as e:
-        logger.error(e)
-
-
-def get_message_ids(service, search_string: str) -> dict:
-    """
-    Searchs Gmail for any messages that match the search string provided.
-
-    :param service: The Gmail API connection.
-    :type service: object
-    :param search_string: The Gmail search string to use.
-    :type search_string: str
-    :returns: A dictionary of messages that match the search string.
-    :rytpe: dict
-    """
-    message_ids = service.users().messages().list(userId='me',
-                                                  q=search_string).execute()
-    return message_ids
-
-def get_message(service, msg_id: str, logger) -> Optional[email.message.EmailMessage]:
-    """
-    Retrive the email message assicated with the given msg_id
-
-    :param service: Gmail API connection
-    :type service: object
-    :param msg_id: The id for the requested message.
-    :type msg_id: str
-    :param logger: Logger to pass information.
-    :type logger: object
-    :returns: The Email message referenced by mss_id
-    :rtype: email.message.EmailMessage
-    """
-    try:
-        msg = service.users().messages().get(userId='me',
-                                             id=msg_id,
-                                             format='raw').execute()
-        msg_in_bytes = base64.urlsafe_b64decode(msg['raw'].encode('ASCII'))
-        email_tmp = email.message_from_bytes(msg_in_bytes,
-                                             policy=policy.default)
-        email_parser = parser.Parser(policy=policy.default)
-        resulting_email = email_parser.parsestr(email_tmp.as_string())
-    except HttpError as error:
-        logger.error(f"Unable to get message for {msg_id} with error {error}")
-        return None
-    else:
-        return resulting_email
-
-def found_messages(message_ids) -> bool:
-    """
-    Return a boolean to indicate if any message have been found.
-
-    :param message_ids:
-    :rtype: bool
-    """
-    return bool(message_ids['resultSizeEstimate'])
+    except HttpError as err:
+        logger.error(err)

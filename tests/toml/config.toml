@@ -37,3 +37,9 @@ archive = false
   subjects = ["退室のご連絡", "入室のご連絡" ]
   regex = 'スパン 碧桜アイビーローズ さんが\s(?:\d{4}年)(?P<date>(?:\d{2}(?:[一-龯])\d{2}(?:[一-龯])\s\d{2}(?:[一-龯])\d{2}(?:[一-龯])))\s(?P<enterexit>(?:に入室しました)|(?:に退室しました))。（(?P<location>(?:[一-龯]+))）'
   archive = false
+
+[people]
+    [people.tamao]
+    names = ["スパン　碧桜アイビーローズ", "ｽﾊﾟﾝ ﾀﾏｵ ｱｲﾋﾞｰﾛｰｽﾞ", "タマオアイビーローズ", "スパン 碧桜アイビーローズ" ]
+    [people.bob]
+    names = ["billy", "billy bob"]
