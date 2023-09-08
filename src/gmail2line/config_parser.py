@@ -15,18 +15,20 @@ def load_toml(config_file: Path) -> Dict[str, Any]:
     Load the configuration file
     """
     try:
-        with open(config_file, mode="rb") as file:
+        with open(config_file, mode='rb') as file:
             config: Dict[str, str] = tomllib.load(file)
     except FileNotFoundError:
-        print(f"Config file: {config_file} not found")
+        print(f'Config file: {config_file} not found')
         config = {}
     return config
+
 
 def gmail_search_string(config: Dict) -> Optional[str]:
     """
     Give easy access to the Gmail Search string.
     """
     return config['gmail'].get('search')
+
 
 def get_valid_path(config_dir: Path, filename: str) -> Optional[Path]:
     """
@@ -54,7 +56,9 @@ def get_valid_path(config_dir: Path, filename: str) -> Optional[Path]:
     return None
 
 
-def senders_subjects(config: Dict) -> Tuple[List[str], List[str], Dict[str, str]]:
+def senders_subjects(
+    config: Dict,
+) -> Tuple[List[str], List[str], Dict[str, str]]:
     """
     Docuemnt me
     """
@@ -70,20 +74,30 @@ def senders_subjects(config: Dict) -> Tuple[List[str], List[str], Dict[str, str]
                 subjects.append(subject)
     return (senders, subjects, sender_as_key)
 
+
 def build_name_lookup(config: Dict) -> Optional[Dict[str, str]]:
+    """
+    Document me
+    """
     name_lookup_idx: Dict[str, str] = {}
     if 'people' in config:
         for name, name_list in config['people'].items():
             aliases = name_list.get('alias')
             for alias in aliases:
                 name_lookup_idx[alias] = name.capitalize()
-
     return name_lookup_idx
 
-def lookup_name(name_lookup_idx: Dict[str, str], alias: Optional[str]) -> Optional[str]:
+
+def lookup_name(
+    name_lookup_idx: Dict[str, str], alias: Optional[str]
+) -> Optional[str]:
+    """
+    Document me
+    """
     if alias is None:
         return None
     return name_lookup_idx.get(alias)
+
 
 def gmail_archive_setting(config: Dict) -> Optional[bool]:
     """
@@ -96,7 +110,10 @@ def gmail_archive_setting(config: Dict) -> Optional[bool]:
     """
     return config['gmail'].get('archive')
 
-def service_archive_settings(config: Dict, config_service: str) -> Optional[bool]:
+
+def service_archive_settings(
+    config: Dict, config_service: str
+) -> Optional[bool]:
     """
     If the service is defined in the config and has an 'archive' option this value will be returned.
     :param config: reference to the service archive setting.
@@ -107,7 +124,9 @@ def service_archive_settings(config: Dict, config_service: str) -> Optional[bool
     return config['services'][config_service].get('archive')
 
 
-def should_mail_be_archived(global_config: Optional[bool], sender_config: Optional[bool]) -> bool:
+def should_mail_be_archived(
+    global_config: Optional[bool], sender_config: Optional[bool]
+) -> bool:
     """
     This function determines if the mail should be removed from the `INBOX` based on the
     configuration settings combining [gmail] and [services.service_name]
@@ -125,19 +144,21 @@ def should_mail_be_archived(global_config: Optional[bool], sender_config: Option
         return True
     return False
 
+
 if __name__ == '__main__':
     from pprint import pprint
-    path = Path.home() / ".config" / "gmail-notify" / "config.toml"
+
+    path = Path.home() / '.config' / 'gmail-notify' / 'config.toml'
     options = load_toml(path)
-    print("All Data")
+    print('All Data')
     pprint(options)
 
     gsearch = gmail_search_string(options)
-    print("GSearch")
+    print('GSearch')
     pprint(gsearch)
     senders, subjects, sender_key = senders_subjects(options)
     pprint(senders)
-    print("\n")
+    print('\n')
     pprint(subjects)
-    print("\n")
+    print('\n')
     pprint(sender_key)

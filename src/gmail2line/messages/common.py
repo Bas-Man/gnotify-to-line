@@ -2,8 +2,6 @@
 Module of common message building functions
 """
 from typing import Optional
-
-from gmail2line import config_parser
 from messages.message_builder import *
 
 

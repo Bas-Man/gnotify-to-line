@@ -4,7 +4,8 @@ This module handles labeling issues with Gmail.
 from typing import Dict, List, Optional
 from googleapiclient.errors import HttpError
 
-def get_labels(service) -> List[Dict[str,str]]:
+
+def get_labels(service) -> List[Dict[str, str]]:
     """
     Get all gmail labels.
 
@@ -24,27 +25,34 @@ def setup_new_label(service) -> None:
     :param service: Gmail Service connection
     :returns: None
     """
-    label_name: str = input("Enter new Label Name: ").strip()
+    label_name: str = input('Enter new Label Name: ').strip()
     # Check that label does not already exist. If it does. Return the label ID
     # If it does not exist. Create the new label and register it with Gmail and
     #  return the newly create ID.
-    print(f"Checking if {label_name} is already registered with account.")
+    print(f'Checking if {label_name} is already registered with account.')
     list_of_labels = get_labels(service)
     label_id = get_label_id_from_list(list_of_labels, label_name)
     if label_id is not None:
-        print("Label already registered in Gmail.")
-        print(f"Label: {label_name} -> Label ID: {label_id}")
+        print('Label already registered in Gmail.')
+        print(f'Label: {label_name} -> Label ID: {label_id}')
     else:
-        print("No label registered in Gmail.")
-        print("Creating new label request.")
+        print('No label registered in Gmail.')
+        print('Creating new label request.')
         new_label = define_label(label_name)
-        print(f"Registering Label: {label_name} with Gmail.")
+        print(f'Registering Label: {label_name} with Gmail.')
         registered_label = register_label_with_gmail(service, new_label)
-        print("New label registered.")
-        print(f"Label: {label_name} has Gmail ID: {get_label_id(registered_label)}")
+        print('New label registered.')
+        print(
+            f'Label: {label_name} has Gmail ID: {get_label_id(registered_label)}'
+        )
 
-def update_messsage_labels(service, msg_id: str, add_labels: Optional[List[str]] = None,
-                           remove_labels: Optional[List[str]] = None) -> str:
+
+def update_messsage_labels(
+    service,
+    msg_id: str,
+    add_labels: Optional[List[str]] = None,
+    remove_labels: Optional[List[str]] = None,
+) -> str:
     """
     Convinence method to allow you to add and or remove multiple labels in a single call.
 
@@ -65,11 +73,16 @@ def update_messsage_labels(service, msg_id: str, add_labels: Optional[List[str]]
     if remove_labels is None:
         remove_labels = []
 
-    msg = service.users().messages().modify(userId='me',
-                                            id=msg_id,
-                                            body={'removeLabelIds': remove_labels,
-                                                  'addLabelIds': add_labels}
-                                            ).execute()
+    msg = (
+        service.users()
+        .messages()
+        .modify(
+            userId='me',
+            id=msg_id,
+            body={'removeLabelIds': remove_labels, 'addLabelIds': add_labels},
+        )
+        .execute()
+    )
     return msg
 
 
@@ -86,12 +99,18 @@ def add_label_to_message(service, msg_id: str, label_id: str) -> str:
     :returns: msg:
     :rtype: str
     """
-    msg = service.users().messages().modify(userId='me',
-                                            id=msg_id,
-                                            body={'removeLabelIds': [],
-                                                  'addLabelIds': [label_id]}
-                                            ).execute()
+    msg = (
+        service.users()
+        .messages()
+        .modify(
+            userId='me',
+            id=msg_id,
+            body={'removeLabelIds': [], 'addLabelIds': [label_id]},
+        )
+        .execute()
+    )
     return msg
+
 
 def archive_message(service, msg_id) -> str:
     """
@@ -103,11 +122,16 @@ def archive_message(service, msg_id) -> str:
     :type msg_id: str
     :returns: msg
     """
-    msg = service.users().messages().modify(userId='me',
-                                            id=msg_id,
-                                            body={'removeLabelIds': ['INBOX'],
-                                                  'addLabelIds': []}
-                                            ).execute()
+    msg = (
+        service.users()
+        .messages()
+        .modify(
+            userId='me',
+            id=msg_id,
+            body={'removeLabelIds': ['INBOX'], 'addLabelIds': []},
+        )
+        .execute()
+    )
     return msg
 
 
@@ -117,11 +141,12 @@ def list_all_labels_and_ids(service, logger) -> None:
 
     :rtype: None
     """
-    logger.info("Looking up all Labels and IDs")
+    logger.info('Looking up all Labels and IDs')
     labels = get_labels(service)
     for label in labels:
         print(f"Label: {label.get('name')} -> ID: {label.get('id')}")
-    logger.info("Finished lookup all Labels and IDs")
+    logger.info('Finished lookup all Labels and IDs')
+
 
 def lookup_label_id(service, logger, args) -> None:
     """
@@ -129,15 +154,15 @@ def lookup_label_id(service, logger, args) -> None:
 
     :rtype: None
     """
-    logger.info(f"Looking up Label ID for Label: {args.label}")
-    print(f"Looking for label {args.label}")
+    logger.info(f'Looking up Label ID for Label: {args.label}')
+    print(f'Looking for label {args.label}')
     labels = get_labels(service)
     label_id = get_label_id_from_list(labels, args.label)
-    print(f"ID for label: {args.label} -> ID: {label_id}")
-    logger.info("Finished looking up Label ID.")
+    print(f'ID for label: {args.label} -> ID: {label_id}')
+    logger.info('Finished looking up Label ID.')
 
 
-def define_label(name: str, mlv: str ="show", llv: str ="labelShow") -> dict:
+def define_label(name: str, mlv: str = 'show', llv: str = 'labelShow') -> dict:
     """
     Define a new label for gmail.
 
@@ -151,9 +176,9 @@ def define_label(name: str, mlv: str ="show", llv: str ="labelShow") -> dict:
     :rtype: dict
     """
     label = {}
-    label["messageListVisibility"] = mlv
-    label["labelListVisibility"] = llv
-    label["name"] = name
+    label['messageListVisibility'] = mlv
+    label['labelListVisibility'] = llv
+    label['name'] = name
     return label
 
 
@@ -168,8 +193,9 @@ def register_label_with_gmail(service, label) -> dict:
     :returns: The label and associated details from gmail.
     :rtype: dict
     """
-    created_label = service.users().labels().create(userId='me',
-                                                    body=label).execute()
+    created_label = (
+        service.users().labels().create(userId='me', body=label).execute()
+    )
     return created_label
 
 
@@ -184,6 +210,7 @@ def get_label_id(label) -> str:
     """
     return label.get('id')
 
+
 def get_label_id_from_list(list_of_labels: List, name: str) -> Optional[str]:
     """
     Document me
@@ -192,6 +219,7 @@ def get_label_id_from_list(list_of_labels: List, name: str) -> Optional[str]:
         if label['name'] == name:
             return label['id']
     return None
+
 
 def get_folders(service, logger):
     """
