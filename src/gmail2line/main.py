@@ -145,7 +145,7 @@ def process(logger, line_token: str, processed_label: str):  # pylint: disable=t
         aliases: Optional[Dict[str, str]] = config_parser.build_name_lookup(config)
         name: Optional[str] = None
         if aliases:
-            name = config_parser.lookup_name(aliases, data.get('name'))
+            name = config_parser.lookup_name(aliases, data.get('alias'))
             if name is None and data.get('name') is not None:
                 name = data.get('name')
         notification_message = common.call_function(name, data)

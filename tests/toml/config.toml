@@ -40,6 +40,6 @@ archive = false
 
 [people]
     [people.tamao]
-    names = ["スパン　碧桜アイビーローズ", "ｽﾊﾟﾝ ﾀﾏｵ ｱｲﾋﾞｰﾛｰｽﾞ", "タマオアイビーローズ", "スパン 碧桜アイビーローズ" ]
+    alias = ["スパン　碧桜アイビーローズ", "ｽﾊﾟﾝ ﾀﾏｵ ｱｲﾋﾞｰﾛｰｽﾞ", "タマオアイビーローズ", "スパン 碧桜アイビーローズ" ]
     [people.bob]
-    names = ["billy", "billy bob"]
+    alias = ["billy", "billy bob"]

@@ -2,6 +2,14 @@
 
 This is a script that connects to Google's Gmail Service through its API. Collects a select set of emails. Then based on the contents of these emails it sends LINE message Notifications. 
 
+
+
+## Requirements
+
+You have already setup your **LINE** Group so that notifications can be sent to several users at once. **Please be aware that you need to setup the group within your Mobile Phone LINE.***
+
+See: [Setting up LINE. &mdash; Gmail + Zapier + LINE Notifications 0.1.0 documentation](https://gmailzapierlinenotify.readthedocs.io/en/latest/setting-up-line.html)
+
 ## Package Installation
 
 Download the package from github and simply run:
@@ -14,7 +22,7 @@ pip install <Package Name>
 
 #### Required files:
 
-1. config.toml
+1. config.toml - This is the main configuration file.
 
 2. credentials.json
 
@@ -50,7 +58,7 @@ archive = false
   subjects = [ "エキッズ" ]
   # Regular expression for extracting data from the email for use in the
   # notification message
-  regex = 'r"""(?P<date>\d{2}月\d{2}日)\s(?P<time>\d{2}時\d{2}分)(?:\r)?\nREPLACEME(?:\r)?\n「(?P<busname>[一-龯]\d{1,2})\s(?P<destination>[一-龯]+)行き・(?P<boardedat>[一-龯]+)」"""'
+  regex = '(?P<date>\d{2}月\d{2}日)\s(?P<time>\d{2}時\d{2}分)(?:\r)?\nREPLACEME(?:\r)?\n「(?P<busname>[一-龯]\d{1,2})\s(?P<destination>[一-龯]+)行き・(?P<boardedat>[一-龯]+)」'
   # Service level archive setting. Overrides Gmail level setting if 
   # present. If archive is not present. Gmail setting is used. If 
   # it is present. It overrides Gmail settings.
@@ -60,11 +68,21 @@ archive = false
   subjects = ["エキッズ" ]
   enter = "入場"
   exit = "出場"
-  regex = 'r"""(?P<date>\d{2}月\d{2}日)　(?P<time>\d{2}時\d{2}分)\nREAPLACEME\n「(?P<provider>[一-龯]+)・(?P<station>[一-龯]+)」を(?P<enterexit>[一-龯]+)"""'
+  regex = '(?P<date>\d{2}月\d{2}日)　(?P<time>\d{2}時\d{2}分)\nREAPLACEME\n「(?P<provider>[一-龯]+)・(?P<station>[一-龯]+)」を(?P<enterexit>[一-龯]+)'
 
+# The people section is provided so you can have a consistent name
+# in message. Several services provide varations on a name depending on 
+# how you have registered the person. Some might be full-width Hiragana.
+# Some might be half-width. In Japan some might be 'lastname' then
+# 'firstname' 
+# While others might just report a first name. So this section creates 
+# a mapping of the of thee name in the email to the name you would you 
+# like to see in the notification. If this section is not provided then
+# the name in the email will be used.
+[people]
+  [people.name]
+  names = ["name1", "name2" ....]
 ```
-
-
 
 ### Secrets and Tokens
 
@@ -82,69 +100,13 @@ After going to the Google Quick start. You should have downloaded your `credenti
 
 ### First Run
 
-This will confirm that you are connecting to gmail successfully. If you do not see a list of labels. Work through the google trouble shooting.
-
-If successful delete the following code:
-
-```python
-# Stage 1 Check Connection
-list_labels_on_setup(service)
-sys.exit(0)
-# Delete from service = get_service() to this line
-```
-
 ### Second Run
 
-In the code you will need to set the varible `name` to some label name you wish to use.  
-Then run the script. This will report the label_id that google assigned to this new label. For simplicity, don't manually create the label.  
-Add the label_id to the secrets.py file.
-
-Delete the next section of code:
-
-```python
-# Stage 2 Create New Label
-  if secrets.LABEL_ID == "":
-      print("We are creating a new label.")
-      # Replace "" with the label name you wish to use.
-      name = ""
-      if len(name) == 0:
-          print("You have not yet set name See 'name = ""' in the code above")
-          print("Do that now and run the script again")
-          sys.exit(0)
-      new_label = define_label(name)
-      new_label = add_label_to_gmail(service, new_label, logger)
-      print(f"Your new label ID is: {get_new_label_id(new_label)}")
-      print("Set this in secrets.py")
-      sys.exit(0)
-  # Delete from service = get_service() to this line
-```
-
-At this point you should have a working sample code.
-
-## Customising the script.
-
-You will need to update the code in the following section:
-
-```python
-if notifier == "NOTE1":
-    logger.debug("Note1")
-    # Your custom code goes here. Bot / Line
-    processed = True
-elif notifier == "NOTE2":
-    logger.debug("Note2")
-    # Your custom code goes here. Bot / Line
-    processed = True
-```
-
-If you are confused. Take a look at gmail.py which is my current working implementation.
-
-## Automating Script Execution
+## ## Automating Script Execution
 
 You can either use good old Cron or systemd.
 I have included a copy of the two files for systemd which should be located in the `/etc/systemd/system/` directory on your system.  
 You will need to modify the path details and the timers to your own needs.
-
-
 
 ## Notes on Regular Expressions.
 

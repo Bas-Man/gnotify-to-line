@@ -74,7 +74,7 @@ def build_name_lookup(config: Dict) -> Optional[Dict[str, str]]:
     name_lookup_idx: Dict[str, str] = {}
     if 'people' in config:
         for name, name_list in config['people'].items():
-            aliases = name_list.get('names')
+            aliases = name_list.get('alias')
             for alias in aliases:
                 name_lookup_idx[alias] = name.capitalize()
 
