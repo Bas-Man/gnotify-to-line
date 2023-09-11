@@ -88,6 +88,59 @@ def command():
                 process(logger, line_token, label_id)
 
 
+def get_persons_name(data: dict) -> Optional[str]:
+    """
+    This function looks up the preferred name of the person if possible.
+    If no match for the name in the lookup table is found. The name in the email
+    will be used. if no name is found then None is returned.
+
+    :param data: The data dict returned after the email has been parsed. Should contain \
+    a key of 'name'
+    :type data: dict
+    :returnes: The standardized name or the name in the email or None
+    """
+    name: Optional[str] = None
+    aliases: Optional[Dict[str, str]] = config_parser.build_name_lookup(config)
+    if aliases:
+        name = config_parser.lookup_name(aliases, data.get('name'))
+        if name is None and data.get('name') is not None:
+            name: Optional[str] = data.get('name')
+    return name
+
+
+def post_processing_gmail_labelling(
+    logger,
+    gmail_resource,
+    message_id: str,
+    processed_label,
+    service: str,
+) -> None:
+    """
+    This function handles adding the 'notified' label to the message after it
+    has been processed. It optionally will mark the message as 'archived'
+    if specified in the configuration file.
+
+    :param logger: The logger handle.
+    :type logger: Object
+    :param gmail_resource: Gmail API handle
+    :type gmail_resource: Object
+    :param message_id: Internal Gmail message ID
+    :type message_id: str
+    :param service: The service that sent the original email. Bus, Train or other.
+    :type service: str
+    :returns: None
+    """
+    # Mail was processed. Add label so its not processed again
+    # Gmail only allows for the shortest time interval of one day.
+    logger.debug('adding label')
+    label.add_label_to_message(gmail_resource, message_id, processed_label)
+    if config_parser.should_mail_be_archived(
+        config_parser.gmail_archive_setting(config),
+        config_parser.service_archive_settings(config, service),
+    ):
+        label.archive_message(service, message_id)
+
+
 def handle_each_email(gmail_resource, message_id, logger) -> dict:
     """
     Process each message and extract who the notifier is as well as the data
@@ -142,21 +195,19 @@ def handle_each_email(gmail_resource, message_id, logger) -> dict:
     return data
 
 
-def get_name_of_notifiee(data: dict) -> Optional[str]:
-    name: Optional[str] = None
-    aliases: Optional[Dict[str, str]] = config_parser.build_name_lookup(config)
-    if aliases:
-        name = config_parser.lookup_name(aliases, data.get('name'))
-        if name is None and data.get('name') is not None:
-            name: Optional[str] = data.get('name')
-    return name
-
-
 def process(
     logger, line_token: str, processed_label: str
-):  # pylint: disable=too-many-branches,too-many-statements
+) -> None:  # pylint: disable=too-many-branches,too-many-statements
     """
-    Document me
+    This the main function for processing all email messages that match the
+    search conditions.
+    :param logger:
+    :type logger: Object
+    :param line_token: Token for accessing LINE notifier
+    :type line_token: str
+    :param processed_label: Gmail Internal Label ID
+    :type processed_labbel: str
+    :returns: None
     """
     logger.info('Looking for email for notification')
     g_search = config_parser.gmail_search_string(config)
@@ -176,7 +227,7 @@ def process(
         data = handle_each_email(gmail_resource, message_id, logger)
         logger.debug(data['notifier'].capitalize())
         logger.debug(f'data: {data}\n')
-        name: Optional[str] = get_name_of_notifiee(data)
+        name: Optional[str] = get_persons_name(data)
         notification_message = common.call_function(name, data)
         if notification_message:
             logger.debug(data['notifier'].capitalize())
@@ -202,27 +253,6 @@ def process(
             )
             # End of the program
     logger.info('Ending cleanly')
-
-
-def post_processing_gmail_labelling(
-    logger,
-    gmail_resource,
-    message_id: str,
-    processed_label,
-    service: str,
-) -> None:
-    """
-    Document me please
-    """
-    # Mail was processed. Add label so its not processed again
-    # Gmail only allows for the shortest time interval of one day.
-    logger.debug('adding label')
-    label.add_label_to_message(gmail_resource, message_id, processed_label)
-    if config_parser.should_mail_be_archived(
-        config_parser.gmail_archive_setting(config),
-        config_parser.service_archive_settings(config, service),
-    ):
-        label.archive_message(service, message_id)
 
 
 if __name__ == '__main__':
