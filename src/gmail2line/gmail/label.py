@@ -5,24 +5,26 @@ from typing import Dict, List, Optional
 from googleapiclient.errors import HttpError
 
 
-def get_labels(service) -> List[Dict[str, str]]:
+def get_labels(gmail_resource) -> List[Dict[str, str]]:
     """
     Get all gmail labels.
 
-    :param service: Gmail service connection object
-    :type service: Object
+    :param gmail_resource: Gmail service connection object
+    :type gmail_resource: Object
     :return: List of Gmail Labels
     :rtype: List[Dict[str,str]]
     """
-    list_of_labels = service.users().labels().list(userId='me').execute()
+    list_of_labels = (
+        gmail_resource.users().labels().list(userId='me').execute()
+    )
     return list_of_labels.get('labels')
 
 
-def setup_new_label(service) -> None:
+def setup_new_label(gmail_resource) -> None:
     """
     This function takes you through the process of creating and setting
     up a new label with Gmail.
-    :param service: Gmail Service connection
+    :param gmail_resource: Gmail Service connection
     :returns: None
     """
     label_name: str = input('Enter new Label Name: ').strip()
@@ -30,7 +32,7 @@ def setup_new_label(service) -> None:
     # If it does not exist. Create the new label and register it with Gmail and
     #  return the newly create ID.
     print(f'Checking if {label_name} is already registered with account.')
-    list_of_labels = get_labels(service)
+    list_of_labels = get_labels(gmail_resource)
     label_id = get_label_id_from_list(list_of_labels, label_name)
     if label_id is not None:
         print('Label already registered in Gmail.')
@@ -40,7 +42,7 @@ def setup_new_label(service) -> None:
         print('Creating new label request.')
         new_label = define_label(label_name)
         print(f'Registering Label: {label_name} with Gmail.')
-        registered_label = register_label_with_gmail(service, new_label)
+        registered_label = register_label_with_gmail(gmail_resource, new_label)
         print('New label registered.')
         print(
             f'Label: {label_name} has Gmail ID: {get_label_id(registered_label)}'
@@ -48,7 +50,7 @@ def setup_new_label(service) -> None:
 
 
 def update_messsage_labels(
-    service,
+    gmail_resource,
     msg_id: str,
     add_labels: Optional[List[str]] = None,
     remove_labels: Optional[List[str]] = None,
@@ -56,8 +58,8 @@ def update_messsage_labels(
     """
     Convinence method to allow you to add and or remove multiple labels in a single call.
 
-    :param service: Gmail service connection object
-    :type service:
+    :param gmail_resource: Gmail service connection object
+    :type gmail_resource:
     :param msg_id: message identifier
     :type msg_id: str
     :param add_labes: A list of labels to be added to the msg_id
@@ -74,7 +76,7 @@ def update_messsage_labels(
         remove_labels = []
 
     msg = (
-        service.users()
+        gmail_resource.users()
         .messages()
         .modify(
             userId='me',
@@ -86,12 +88,12 @@ def update_messsage_labels(
     return msg
 
 
-def add_label_to_message(service, msg_id: str, label_id: str) -> str:
+def add_label_to_message(gmail_resource, msg_id: str, label_id: str) -> str:
     """
     Add the provided label ID string to the Gmail message.
 
-    :param service: Gmail service connection object
-    :type service:
+    :param gmail_resource: Gmail service connection object
+    :type gmail_resource:
     :param msg_id: message identifier
     :type msg_id: str
     :param label_id: Label to be applied to message
@@ -100,7 +102,7 @@ def add_label_to_message(service, msg_id: str, label_id: str) -> str:
     :rtype: str
     """
     msg = (
-        service.users()
+        gmail_resource.users()
         .messages()
         .modify(
             userId='me',
@@ -112,18 +114,18 @@ def add_label_to_message(service, msg_id: str, label_id: str) -> str:
     return msg
 
 
-def archive_message(service, msg_id) -> str:
+def archive_message(gmail_resource, msg_id) -> str:
     """
     Remove the 'INBOX' label from the provided message identifier
 
-    :param service: Gmail service connection object
-    :type service:
+    :param gmail_resource: Gmail service connection object
+    :type gmail_resource:
     :param msg_id: message identifier
     :type msg_id: str
     :returns: msg
     """
     msg = (
-        service.users()
+        gmail_resource.users()
         .messages()
         .modify(
             userId='me',
@@ -135,20 +137,20 @@ def archive_message(service, msg_id) -> str:
     return msg
 
 
-def list_all_labels_and_ids(service, logger) -> None:
+def list_all_labels_and_ids(gmail_resource, logger) -> None:
     """
     Displays all Gmail Labels found.
 
     :rtype: None
     """
     logger.info('Looking up all Labels and IDs')
-    labels = get_labels(service)
+    labels = get_labels(gmail_resource)
     for label in labels:
         print(f"Label: {label.get('name')} -> ID: {label.get('id')}")
     logger.info('Finished lookup all Labels and IDs')
 
 
-def lookup_label_id(service, logger, args) -> None:
+def lookup_label_id(gmail_resource, logger, args) -> None:
     """
     Look up the Internal Gmail ID label for the user defined label provided.
 
@@ -156,7 +158,7 @@ def lookup_label_id(service, logger, args) -> None:
     """
     logger.info(f'Looking up Label ID for Label: {args.label}')
     print(f'Looking for label {args.label}')
-    labels = get_labels(service)
+    labels = get_labels(gmail_resource)
     label_id = get_label_id_from_list(labels, args.label)
     print(f'ID for label: {args.label} -> ID: {label_id}')
     logger.info('Finished looking up Label ID.')
@@ -182,19 +184,22 @@ def define_label(name: str, mlv: str = 'show', llv: str = 'labelShow') -> dict:
     return label
 
 
-def register_label_with_gmail(service, label) -> dict:
+def register_label_with_gmail(gmail_resource, label) -> dict:
     """
     Register the provide label with the gmail system.
 
-    :param service: The gmail service
-    :type service: object
+    :param gmail_resource: The gmail service
+    :type gmail_resource: object
     :param label: Label to be registered
     :type label: dict
     :returns: The label and associated details from gmail.
     :rtype: dict
     """
     created_label = (
-        service.users().labels().create(userId='me', body=label).execute()
+        gmail_resource.users()
+        .labels()
+        .create(userId='me', body=label)
+        .execute()
     )
     return created_label
 
@@ -221,13 +226,13 @@ def get_label_id_from_list(list_of_labels: List, name: str) -> Optional[str]:
     return None
 
 
-def get_folders(service, logger):
+def get_folders(gmail_resource, logger):
     """
     Document me
     """
     # Call the Gmail API
     try:
-        results = service.users().labels().list(userId='me').execute()
+        results = gmail_resource.users().labels().list(userId='me').execute()
         labels = results.get('labels', [])
 
         if not labels:

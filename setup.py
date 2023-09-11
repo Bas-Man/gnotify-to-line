@@ -1,10 +1,25 @@
 from setuptools import setup, find_packages
 
+CLASSIFIERS = [
+    'Development Status :: 1 - Beta',
+    'Intended Audience :: Developers',
+    'Topic :: Internet',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3.7',
+]
 setup(
     name='gmail2line',
     version='0.1.0',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
+    entry_points={
+        'console_scripts': [
+            'g2line = scripts.g2line:command',
+        ],
+    },
+    classifiers=CLASSIFIERS,
+    keywords='gmail line notifier notification',
     install_requires=[
         'google-api-core==1.25.0',
         'google-api-python-client==1.12.8',
@@ -17,15 +32,10 @@ setup(
         'tomli==2.0.1',
     ],
     extras_require={
-        "dev": [
-            "pytest==7.4.0",
+        'dev': [
+            'pytest==7.4.0',
             'python-dotenv==0.21.1',
             # List development-specific dependencies here
-        ],
-    },
-    entry_points={
-        'console_scripts': [
-            'g2line = gmail2line.main:cli',
         ],
     },
 )

@@ -4,17 +4,26 @@ import os
 from pathlib import Path
 import sys
 from typing import Dict, Optional
-from dotenv import load_dotenv
-import config_parser
-import glogger
-import line
+
+dov_env = True
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:
+    dov_env = False
+    print('borked!')
+
+from gmail2line import config_parser
+from gmail2line import glogger
+from gmail2line import line
 from gmail2line import find_matches
 from gmail2line.cli import ExitCodes
 from gmail2line.cli import health
 from gmail2line.gmail import service, mail, label
 from gmail2line.messages import common
 
-load_dotenv()
+if dov_env:
+    load_dotenv()
+
 NAME = os.getenv('NAME_1')
 
 PICKLE = 'token.pickle'
@@ -25,7 +34,7 @@ TOML_FILE = CONFIG_DIR / 'config.toml'
 config = config_parser.load_toml(TOML_FILE)
 
 
-def cli():
+def command():
     """
     Document me
     """
@@ -79,13 +88,13 @@ def cli():
                 process(logger, line_token, label_id)
 
 
-def handle_each_email(service, message_id, logger) -> dict:
+def handle_each_email(gmail_resource, message_id, logger) -> dict:
     """
     Process each message and extract who the notifier is as well as the data
     in the body of the email
 
-    :param service: Gmail API connection
-    :type service: object
+    :param gmail_resource: Gmail API connection
+    :type gmail_resource: object
     :param message_id: The id of the message to be processed.
     :type message_id: str
     :param logger: The logger object
@@ -96,7 +105,7 @@ def handle_each_email(service, message_id, logger) -> dict:
     # Get data from config so that it is easier to use.
     _, subjects, sender_service_key = config_parser.senders_subjects(config)
     data: Dict[str, str] = {}
-    single_email = mail.get_message(service, message_id, logger)
+    single_email = mail.get_message(gmail_resource, message_id, logger)
     # Check the subject is an expected notification subject line
     if single_email is not None and 'subject' in single_email:
         subject: str = single_email.get('subject')
@@ -133,6 +142,16 @@ def handle_each_email(service, message_id, logger) -> dict:
     return data
 
 
+def get_name_of_notifiee(data: dict) -> Optional[str]:
+    name: Optional[str] = None
+    aliases: Optional[Dict[str, str]] = config_parser.build_name_lookup(config)
+    if aliases:
+        name = config_parser.lookup_name(aliases, data.get('name'))
+        if name is None and data.get('name') is not None:
+            name: Optional[str] = data.get('name')
+    return name
+
+
 def process(
     logger, line_token: str, processed_label: str
 ):  # pylint: disable=too-many-branches,too-many-statements
@@ -141,11 +160,11 @@ def process(
     """
     logger.info('Looking for email for notification')
     g_search = config_parser.gmail_search_string(config)
-    g_service = service.get_service(CONFIG_DIR)
+    gmail_resource = service.get_resource(CONFIG_DIR)
     if g_search is None:
         logger.info('Search String is not valid. Unable to get messages.')
         sys.exit(ExitCodes.MISSING_GOOGLE_SEARCH_STRING)
-    message_ids = mail.get_message_ids(g_service, g_search)
+    message_ids = mail.get_message_ids(gmail_resource, g_search)
     if not mail.found_messages(message_ids):
         logger.debug('There were no messages.')
         logger.info('Ending cleanly with no messages to process')
@@ -154,17 +173,10 @@ def process(
     logger.debug(f'message_ids:\n\t{list_of_message_ids}\n')
     for message_id in list_of_message_ids:
         processed = False
-        data = handle_each_email(g_service, message_id, logger)
+        data = handle_each_email(gmail_resource, message_id, logger)
         logger.debug(data['notifier'].capitalize())
         logger.debug(f'data: {data}\n')
-        aliases: Optional[Dict[str, str]] = config_parser.build_name_lookup(
-            config
-        )
-        name: Optional[str] = None
-        if aliases:
-            name = config_parser.lookup_name(aliases, data.get('name'))
-            if name is None and data.get('name') is not None:
-                name = data.get('name')
+        name: Optional[str] = get_name_of_notifiee(data)
         notification_message = common.call_function(name, data)
         if notification_message:
             logger.debug(data['notifier'].capitalize())
@@ -181,20 +193,37 @@ def process(
             logger.info('Non-Notification email from expected sender')
 
         if processed:
-            # Mail was processed. Add label so its not processed again
-            # Gmail only allows for the shortest time interval of one day.
-            logger.debug('adding label')
-            label.add_label_to_message(g_service, message_id, processed_label)
-            if config_parser.should_mail_be_archived(
-                config_parser.gmail_archive_setting(config),
-                config_parser.service_archive_settings(
-                    config, data['notifier']
-                ),
-            ):
-                label.archive_message(service, message_id)
+            post_processing_gmail_labelling(
+                logger,
+                gmail_resource,
+                message_id,
+                processed_label,
+                data['notifier'],
+            )
             # End of the program
     logger.info('Ending cleanly')
 
 
+def post_processing_gmail_labelling(
+    logger,
+    gmail_resource,
+    message_id: str,
+    processed_label,
+    service: str,
+) -> None:
+    """
+    Document me please
+    """
+    # Mail was processed. Add label so its not processed again
+    # Gmail only allows for the shortest time interval of one day.
+    logger.debug('adding label')
+    label.add_label_to_message(gmail_resource, message_id, processed_label)
+    if config_parser.should_mail_be_archived(
+        config_parser.gmail_archive_setting(config),
+        config_parser.service_archive_settings(config, service),
+    ):
+        label.archive_message(service, message_id)
+
+
 if __name__ == '__main__':
-    cli()
+    command()

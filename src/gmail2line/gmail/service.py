@@ -8,13 +8,16 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from gmail2line import config_parser
 
-PICKLE = "token.pickle"
+PICKLE = 'token.pickle'
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/gmail.modify',
-          'https://www.googleapis.com/auth/gmail.labels']
+SCOPES = [
+    'https://www.googleapis.com/auth/gmail.modify',
+    'https://www.googleapis.com/auth/gmail.labels',
+]
 
-def get_service(config_dir: Path):
+
+def get_resource(config_dir: Path):
     """
     Connect to the Gmail API.
 
@@ -26,9 +29,11 @@ def get_service(config_dir: Path):
     # created automatically when the authorization flow completes for the first
     # time.
     pickle_file = config_parser.get_valid_path(config_dir, PICKLE)
-    credentials_json = config_parser.get_valid_path(config_dir, 'credentials.json')
+    credentials_json = config_parser.get_valid_path(
+        config_dir, 'credentials.json'
+    )
     if pickle_file is not None:
-        with pickle_file.open("rb") as file:
+        with pickle_file.open('rb') as file:
             creds = pickle.load(file)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -36,7 +41,8 @@ def get_service(config_dir: Path):
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                credentials_json, SCOPES)
+                credentials_json, SCOPES
+            )
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         # If there is no pickle file we store it in the .config/app directory

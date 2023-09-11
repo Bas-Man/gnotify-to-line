@@ -2,7 +2,7 @@
 Module of common message building functions
 """
 from typing import Optional
-from messages.message_builder import *
+from gmail2line.messages.message_builder import *
 
 
 def call_function(name: Optional[str], data: dict) -> Optional[str]:

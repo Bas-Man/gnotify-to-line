@@ -2,6 +2,6 @@
 Module for Gmail related functions.
 """
 
-from gmail import mail
-from gmail import label
-from gmail import service
+from gmail2line.gmail import mail
+from gmail2line.gmail import label
+from gmail2line.gmail import service
