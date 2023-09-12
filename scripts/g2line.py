@@ -4,27 +4,19 @@ import os
 from pathlib import Path
 import sys
 from typing import Dict, Optional
-
-dov_env = True
-try:
-    from dotenv import load_dotenv
-except ModuleNotFoundError:
-    dov_env = False
-    print('borked!')
-
+from dotenv import load_dotenv
 from gmail2line import config_parser
 from gmail2line import glogger
-from gmail2line import line
+from gmail2line.notifiers import line
 from gmail2line import find_matches
 from gmail2line.cli import ExitCodes
 from gmail2line.cli import health
 from gmail2line.gmail import resource, mail, label
-from gmail2line.messages import common
+from gmail2line.messages import builder
 
-if dov_env:
-    load_dotenv()
+load_dotenv()
 
-NAME = os.getenv('NAME_1')
+name = os.getenv('NAME')
 
 PICKLE = 'token.pickle'
 CONFIG_DIR = Path.home() / '.config' / 'gmail-notify'
@@ -235,7 +227,7 @@ def process(
         logger.debug(data['notifier'].capitalize())
         logger.debug(f'data: {data}\n')
         name: Optional[str] = get_persons_name(data)
-        notification_message = common.call_function(name, data)
+        notification_message = builder.build_message(name, data)
         if notification_message:
             logger.debug(data['notifier'].capitalize())
             if not suppress_notification:

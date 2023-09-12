@@ -34,7 +34,6 @@ setup(
         # List development-specific dependencies herepy
         'dev': [
             'pytest==7.4.0',
-            'python-dotenv==0.21.1',
         ],
     },
 )

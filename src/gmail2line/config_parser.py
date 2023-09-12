@@ -39,7 +39,7 @@ def get_valid_path(config_dir: Path, filename: str) -> Optional[Path]:
     :type config_dir: Path
     :param filename: Name of the file to check for.
     :type filename: str
-    :return: Returns the path found if it exists or None if no filename.
+    :returns: Returns the path found if it exists or None if no filename.
     :rtype: Optional[Path]
     """
     # Check if file exists in the current directory
@@ -116,6 +116,7 @@ def service_archive_settings(
 ) -> Optional[bool]:
     """
     If the service is defined in the config and has an 'archive' option this value will be returned.
+
     :param config: reference to the service archive setting.
     :type: dict
     :Returns: None or the value stored in the option.

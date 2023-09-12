@@ -1,6 +1,4 @@
-from gmail2line.messages import common
-from gmail2line.messages import message_builder
-from gmail2line.messages.message_builder import *
+from gmail2line.messages.builder import build_message
 
 
 def test_call_train_func_exit():
@@ -13,7 +11,7 @@ def test_call_train_func_exit():
         'notifier': 'train',
     }
 
-    result = common.call_function('Tester', data)
+    result = build_message('Tester', data)
     assert (
         result
         == 'Train Notification for Tester.\n08月20日 at 17時28分\nExited 駒沢大学駅'
@@ -30,7 +28,7 @@ def test_call_train_func_entered():
         'notifier': 'train',
     }
 
-    result = common.call_function('Tester', data)
+    result = build_message('Tester', data)
     assert (
         result
         == 'Train Notification for Tester.\n08月20日 at 17時28分\nEntered 駒沢大学駅'
@@ -45,7 +43,7 @@ def test_call_institute_func():
         'notifier': 'tokyoinstitute',
     }
 
-    result = common.call_function('Tester', data)
+    result = build_message('Tester', data)
     print(result)
     assert result == '駒沢大学教室 Notification for Tester.\n08月17日 16時50分 に入室しました'
 
@@ -60,5 +58,5 @@ def test_call_no_function():
         'notifier': 'bogus',
     }
 
-    result = common.call_function('Tester', data)
+    result = build_message('Tester', data)
     assert result is None

@@ -2,10 +2,10 @@
 Module of common message building functions
 """
 from typing import Optional
-from gmail2line.messages.message_builder import *
+from gmail2line.messages.japan import *
 
 
-def call_function(name: Optional[str], data: dict) -> Optional[str]:
+def build_message(name: Optional[str], data: dict) -> Optional[str]:
     """
     Based on the value of the `key` 'notifier' the correct message building function
     is called.
