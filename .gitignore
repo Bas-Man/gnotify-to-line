@@ -12,3 +12,4 @@ docs
 .pytest_cache
 .vscode
 pyrightconfig.json
+.tox

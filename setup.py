@@ -1,10 +1,8 @@
 from setuptools import setup, find_packages
 
 CLASSIFIERS = [
-    'Development Status :: 1 - Beta',
     'Intended Audience :: Developers',
     'Topic :: Internet',
-    'License :: OSI Approved :: MIT License',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3.7',
 ]
@@ -30,12 +28,13 @@ setup(
         'line-notify==0.1.4',
         'toml==0.10.2',
         'tomli==2.0.1',
+        'python-dotenv==0.21.1',
     ],
     extras_require={
+        # List development-specific dependencies herepy
         'dev': [
             'pytest==7.4.0',
             'python-dotenv==0.21.1',
-            # List development-specific dependencies here
         ],
     },
 )
