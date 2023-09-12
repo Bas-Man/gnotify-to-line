@@ -5,7 +5,7 @@ It also provides a test to check the gmail connection.
 from pathlib import Path
 from typing import Optional
 import httplib2
-from gmail2line.gmail import service
+from gmail2line.gmail import resource
 
 
 def check_credentials_json_file(config_dir: Path) -> bool:
@@ -58,7 +58,7 @@ def check_health(config_dir: Path) -> None:
         has_errors = True
     try:
         print('Checking connection to Google.')
-        if service.get_resource(config_dir) is None:
+        if resource.get_resource(config_dir) is None:
             print('Unable to connect to Gmail')
             has_errors = True
     except httplib2.ServerNotFoundError as message:

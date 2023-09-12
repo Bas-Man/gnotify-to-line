@@ -18,7 +18,7 @@ from gmail2line import line
 from gmail2line import find_matches
 from gmail2line.cli import ExitCodes
 from gmail2line.cli import health
-from gmail2line.gmail import service, mail, label
+from gmail2line.gmail import resource, mail, label
 from gmail2line.messages import common
 
 if dov_env:
@@ -57,15 +57,22 @@ def command():
         help='Check for configuration files and Gmail connection',
         action='store_true',
     )
+    parse.add_argument(
+        '--suppressed',
+        help='Process message, but suspress notifications.',
+        action='store_true',
+    )
     args = parse.parse_args()
 
     logger = glogger.setup_logging(CONFIG_DIR, config['log'].get('lvl'))
     if args.label_all:
-        label.list_all_labels_and_ids(service.get_service(CONFIG_DIR), logger)
+        label.list_all_labels_and_ids(
+            resource.get_resource(CONFIG_DIR), logger
+        )
     elif args.label:
-        label.lookup_label_id(service.get_service(CONFIG_DIR), logger, args)
+        label.lookup_label_id(resource.get_resource(CONFIG_DIR), logger, args)
     elif args.label_new:
-        label.setup_new_label(service.get_service(CONFIG_DIR))
+        label.setup_new_label(resource.get_resource(CONFIG_DIR))
     elif args.health:
         health.check_health(CONFIG_DIR)
     else:
@@ -85,7 +92,7 @@ def command():
                 logger.info('Processing ending early.')
                 sys.exit(ExitCodes.NO_LINE_ACCESS_TOKEN)
             else:
-                process(logger, line_token, label_id)
+                process(logger, line_token, label_id, args.suppressed)
 
 
 def get_persons_name(data: dict) -> Optional[str]:
@@ -196,7 +203,7 @@ def handle_each_email(gmail_resource, message_id, logger) -> dict:
 
 
 def process(
-    logger, line_token: str, processed_label: str
+    logger, line_token: str, processed_label: str, suppress_notification: bool
 ) -> None:  # pylint: disable=too-many-branches,too-many-statements
     """
     This the main function for processing all email messages that match the
@@ -211,7 +218,7 @@ def process(
     """
     logger.info('Looking for email for notification')
     g_search = config_parser.gmail_search_string(config)
-    gmail_resource = service.get_resource(CONFIG_DIR)
+    gmail_resource = resource.get_resource(CONFIG_DIR)
     if g_search is None:
         logger.info('Search String is not valid. Unable to get messages.')
         sys.exit(ExitCodes.MISSING_GOOGLE_SEARCH_STRING)
@@ -231,7 +238,13 @@ def process(
         notification_message = common.call_function(name, data)
         if notification_message:
             logger.debug(data['notifier'].capitalize())
-            line.send_notification(notification_message, line_token)
+            if not suppress_notification:
+                line.send_notification(notification_message, line_token)
+            else:
+                # Suppressing notifications.
+                logger.info(
+                    f"Message notification for {data['notifier']} has been suppressed."
+                )
             processed = True
         else:
             logger.info(
