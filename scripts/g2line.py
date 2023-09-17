@@ -56,7 +56,9 @@ def command():
     )
     args = parse.parse_args()
 
-    logger = glogger.setup_logging(CONFIG_DIR, config['log'].get('lvl'))
+    logger = glogger.setup_logging(
+        CONFIG_DIR, config['log'].get('lvl', 'INFO')
+    )
     if args.label_all:
         label.list_all_labels_and_ids(
             resource.get_resource(CONFIG_DIR), logger
