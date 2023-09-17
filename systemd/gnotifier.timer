@@ -4,15 +4,18 @@ Requires=gnotifier.service
 
 [Timer]
 Unit=gnotifier.service
+# Every Week Day Day time
+OnCalendar=Mon,Tue,Wed,Thu,Fri *-*-* 08..20:00,05,10,15,20,25,30,35,40,45,50,55:00
 # KidzDuo arriving
-OnCalendar=Mon,Tue,Thu *-*-* 14:20,25,30,35,40,45,50,55:00
+#OnCalendar=Mon,Tue,Thu *-*-* 13..14:20,25,30,35,40,45,50,55:00
+#OnCalendar=Mon,Tue,Thu *-*-* 15:00,5,10,15,20,25,30,35,40,45:00
 # Swimming
-OnCalendar=Wed *-*-* 15:50,55:00
-OnCalendar=Wed *-*-* 16:0,5,10,15,20:00
-OnCalendar=Wed *-*-* 18:0,5,10,15,20,25:00
+#OnCalendar=Wed *-*-* 15:50,55:00
+#OnCalendar=Wed *-*-* 16:0,5,10,15,20:00
+#OnCalendar=Wed *-*-* 18:0,5,10,15,20,25,30,35:00
 # KidzDuo Leaving
-OnCalendar=Mon,Tue,Thu *-*-* 18:0,5,10,15,20,25,30,35:00
-OnCalendar=Mon,Tue,Thu *-*-* 19:0,5,10,15,20,25:00
+#OnCalendar=Mon,Tue,Thu *-*-* 18:0,5,10,15,20,25,30,35:00
+#OnCalendar=Mon,Tue,Thu *-*-* 19:0,5,10,15,20,25:00
 AccuracySec=1s
 
 [Install]

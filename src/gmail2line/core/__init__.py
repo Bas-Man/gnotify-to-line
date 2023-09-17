@@ -1,4 +1,4 @@
 """
 Core functions should live here
 """
-from gmail2line.core import patterns
+from gmail2line.core import matching

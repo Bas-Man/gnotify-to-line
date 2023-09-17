@@ -4,9 +4,10 @@ Wants=gnotifier.timer
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/python3 /home/ACCOUNT/gmail/gmail.py
-WorkingDirectory=/home/ACCOUNT/gmail
-
+ExecStart=/home/USERNAME/.local/bin/g2line
+WorkingDirectory=/home/USERNAME/.config/gmail-notify
+Environment="LINE_TOKEN=TOKENHERE"
+Environment="LABEL_ID=LABELHERE"
 
 [Install]
 WantedBy=multi-user.target

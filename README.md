@@ -2,8 +2,6 @@
 
 This is a script that connects to Google's Gmail Service through its API. Collects a select set of emails. Then based on the contents of these emails it sends LINE message Notifications. 
 
-
-
 ## Requirements
 
 You have already setup your **LINE** Group so that notifications can be sent to several users at once. **Please be aware that you need to setup the group within your Mobile Phone LINE.***
@@ -96,7 +94,7 @@ These need to be kept secure as such the following things should be kept in mind
 
 If you found this code first on github, I would direct you to [this article series.](https://dev.to/basman/connecting-to-gmail-api-with-python-546b) This will walk you through setting things up with Google.
 
-After going to the Google Quick start. You should have downloaded your `credentials.json` file. Run the gmail-sample.py 
+After going tthough the Google Quick start. You should have downloaded your `credentials.json` file. Run the gmail-sample.py 
 
 ### First Run
 
@@ -105,10 +103,14 @@ After going to the Google Quick start. You should have downloaded your `credenti
 ## ## Automating Script Execution
 
 You can either use good old Cron or systemd.
-I have included a copy of the two files for systemd which should be located in the `/etc/systemd/system/` directory on your system.  
-You will need to modify the path details and the timers to your own needs.
+
+### Note that you will need to set up the environment variables.
+
+I have included a copy of the two files for systemd which should be located in your home directory under `.config/systemd/user/`. You you need both `gnotifier.service` and `gnotofier.timer` . Once these files are created and edited you can run the command `systemctl --user enable gnotifier.service` followed by `systemctl --user start gnotifier.service` You can check the status the service using `systemctl --user status gnotifier.service`
 
 ## Notes on Regular Expressions.
+
+
 
 The sample provided is based on my own needs here in Japan. If you are planning to use this in another country with another language. You will need to research how to create the needed `regex` strings. The function that performs the regex 
 

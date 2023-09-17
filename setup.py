@@ -5,12 +5,17 @@ CLASSIFIERS = [
     'Topic :: Internet',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
 ]
 setup(
     name='gmail2line',
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
+    scripts=['src/gmail2line/scripts/g2line.py'],
     entry_points={
         'console_scripts': [
             'g2line = scripts.g2line:command',
