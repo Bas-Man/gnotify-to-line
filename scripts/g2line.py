@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 from typing import Dict, Optional
 from dotenv import load_dotenv
-from gmail2line import config_parser
+from gmail2line.config import parser as config_parser
 from gmail2line import glogger
 from gmail2line.notifiers import line
 from gmail2line import find_matches
@@ -16,9 +16,6 @@ from gmail2line.messages import builder
 
 load_dotenv()
 
-name = os.getenv('NAME')
-
-PICKLE = 'token.pickle'
 CONFIG_DIR = Path.home() / '.config' / 'gmail-notify'
 TOML_FILE = CONFIG_DIR / 'config.toml'
 
@@ -57,7 +54,7 @@ def command():
     args = parse.parse_args()
 
     logger = glogger.setup_logging(
-        CONFIG_DIR, config['log'].get('lvl', 'INFO')
+        CONFIG_DIR, config_parser.get_logging_level(config)
     )
     if args.label_all:
         label.list_all_labels_and_ids(
@@ -228,7 +225,10 @@ def process(
         data = handle_each_email(gmail_resource, message_id, logger)
         logger.debug(data['notifier'].capitalize())
         logger.debug(f'data: {data}\n')
-        name: Optional[str] = get_persons_name(data)
+        # Use Environment provided name.
+        name: Optional[str] = os.getenv('NAME')
+        if name is None:
+            name = get_persons_name(data)
         notification_message = builder.build_message(name, data)
         if notification_message:
             logger.debug(data['notifier'].capitalize())

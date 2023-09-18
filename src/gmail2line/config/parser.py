@@ -99,6 +99,18 @@ def lookup_name(
     return name_lookup_idx.get(alias)
 
 
+def get_logging_level(config: Dict) -> str:
+    """
+    Returns the logging level if set in the config file.
+    Defaults to 'INFO' if no option has been set.
+
+    :param config:
+    :type config: Dict
+    :returns: Logging level.
+    """
+    return config['log'].get('lvl', 'INFO')
+
+
 def gmail_archive_setting(config: Dict) -> Optional[bool]:
     """
     This function accesses the [gmail] archive setting.

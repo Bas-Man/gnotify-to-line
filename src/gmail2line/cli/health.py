@@ -2,6 +2,7 @@
 This modules provides functionality to check configuration files can be found.
 It also provides a test to check the gmail connection.
 """
+import os
 from pathlib import Path
 from typing import Optional
 import httplib2
@@ -32,11 +33,9 @@ def check_config_toml_file(config_dir: Path) -> bool:
     return file_check.exists()
 
 
-def check_line_token(token_name: str) -> Optional[str]:
-    import os
-
+def check_line_token(token_name: str) -> bool:
     has_token = os.getenv(token_name)
-    return has_token
+    return has_token is not None
 
 
 def check_health(config_dir: Path) -> None:
@@ -56,8 +55,12 @@ def check_health(config_dir: Path) -> None:
     if check_config_toml_file(config_dir) is False:
         print('Unable to find file: config.tml')
         has_errors = True
+    print('Checking Token')
+    if not check_line_token('LINE_TOKEN'):
+        print('Unable to find LINE_TOKEN')
+        has_errors = True
+    print('Checking connection to Google.')
     try:
-        print('Checking connection to Google.')
         if resource.get_resource(config_dir) is None:
             print('Unable to connect to Gmail')
             has_errors = True

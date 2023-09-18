@@ -2,7 +2,14 @@
 Module of common message building functions
 """
 from typing import Optional
-from gmail2line.messages.japan import *
+from gmail2line.messages.japan import (
+    nichinoken,
+    bus,
+    train,
+    tokyoinstitute,
+    gate,
+    kidzduo,
+)
 
 
 def build_message(name: Optional[str], data: dict) -> Optional[str]:

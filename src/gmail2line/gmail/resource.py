@@ -6,7 +6,7 @@ from pathlib import Path
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
-from gmail2line import config_parser
+from gmail2line.config import parser as config_parser
 
 PICKLE = 'token.pickle'
 
