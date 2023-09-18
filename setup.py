@@ -15,7 +15,7 @@ setup(
     version='0.1.1',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
-    scripts=['src/gmail2line/scripts/g2line.py'],
+    scripts=['scripts/g2line.py'],
     entry_points={
         'console_scripts': [
             'g2line = scripts.g2line:command',
