@@ -139,7 +139,7 @@ def post_processing_gmail_labelling(
         label.archive_message(service, message_id)
 
 
-def handle_each_email(gmail_resource, message_id, logger) -> dict:
+def process_single_email(gmail_resource, message_id, logger) -> dict:
     """
     Process each message and extract who the notifier is as well as the data
     in the body of the email
@@ -222,7 +222,7 @@ def process(
     logger.debug(f'message_ids:\n\t{list_of_message_ids}\n')
     for message_id in list_of_message_ids:
         processed = False
-        data = handle_each_email(gmail_resource, message_id, logger)
+        data = process_single_email(gmail_resource, message_id, logger)
         logger.debug(data['notifier'].capitalize())
         logger.debug(f'data: {data}\n')
         # Use Environment provided name.
