@@ -15,10 +15,9 @@ setup(
     version='0.1.1',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
-    scripts=['scripts/g2line.py'],
     entry_points={
         'console_scripts': [
-            'g2line = scripts.g2line:command',
+            'g2line = gmail2line.scripts.g2line:command',
         ],
     },
     classifiers=CLASSIFIERS,
