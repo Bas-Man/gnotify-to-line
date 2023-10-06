@@ -95,7 +95,7 @@ def get_persons_name(data: dict) -> Optional[str]:
     :param data: The data dict returned after the email has been parsed. Should contain \
     a key of 'name'
     :type data: dict
-    :returnes: The standardized name or the name in the email or None
+    :returns: The standardized name or the name in the email or None
     """
     name: Optional[str] = None
     aliases: Optional[Dict[str, str]] = config_parser.build_name_lookup(config)
@@ -227,8 +227,11 @@ def process(
         logger.debug(f'data: {data}\n')
         # Use Environment provided name.
         name: Optional[str] = os.getenv('NAME')
+        logger.debug(f'Name: {name}')
         if name is None:
+            logger.debug('looking up name')
             name = get_persons_name(data)
+            logger.debug(f'lookup Name: {name}')
         notification_message = builder.build_message(name, data)
         if notification_message:
             logger.debug(data['notifier'].capitalize())

@@ -66,7 +66,7 @@ archive = false
   subjects = ["エキッズ" ]
   enter = "入場"
   exit = "出場"
-  regex = '(?P<date>\d{2}月\d{2}日)　(?P<time>\d{2}時\d{2}分)\nREAPLACEME\n「(?P<provider>[一-龯]+)・(?P<station>[一-龯]+)」を(?P<enterexit>[一-龯]+)'
+  regex = '(?P<date>\d{2}月\d{2}日)　(?P<time>\d{2}時\d{2}分)\nREAPLACEME\n「(?P<provider>[一-龯]+)・(?P<station>.*)」を(?P<enterexit>[一-龯]+)'
 
 # The people section is provided so you can have a consistent name
 # in message. Several services provide varations on a name depending on 
@@ -109,8 +109,6 @@ You can either use good old Cron or systemd.
 I have included a copy of the two files for systemd which should be located in your home directory under `.config/systemd/user/`. You you need both `gnotifier.service` and `gnotofier.timer` . Once these files are created and edited you can run the command `systemctl --user enable gnotifier.service` followed by `systemctl --user start gnotifier.service` You can check the status the service using `systemctl --user status gnotifier.service`
 
 ## Notes on Regular Expressions.
-
-
 
 The sample provided is based on my own needs here in Japan. If you are planning to use this in another country with another language. You will need to research how to create the needed `regex` strings. The function that performs the regex 
 

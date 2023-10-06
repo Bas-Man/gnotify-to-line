@@ -2,6 +2,7 @@
 Module of common message building functions
 """
 from typing import Optional
+
 from gmail2line.messages.japan import (
     nichinoken,
     bus,

@@ -5,7 +5,8 @@ from pathlib import Path
 from logging.handlers import RotatingFileHandler
 import logging
 
-LOG_FILE = "gnotifier.log"
+LOG_FILE = 'gnotifier.log'
+
 
 def setup_logging(config_dir: Path, level: str):
     """
@@ -22,14 +23,16 @@ def setup_logging(config_dir: Path, level: str):
     # https://github.com/googleapis/google-api-python-client/issues/29
     log_file = config_dir / LOG_FILE
     logging.getLogger('googleapiclient.discovery_cache').setLevel(
-        logging.ERROR)
-    logger = logging.getLogger("gmail-notifier")
+        logging.ERROR
+    )
+    logger = logging.getLogger('gmail-notifier')
     level = logging.getLevelName(level)
     logging.basicConfig(
-        handlers=[RotatingFileHandler(log_file,
-                                      maxBytes=100000,
-                                      backupCount=10)],
+        handlers=[
+            RotatingFileHandler(log_file, maxBytes=100000, backupCount=10)
+        ],
         level=level,
-        format='%(asctime)s - %(levelname)s - %(message)s')
+        format='%(asctime)s - %(levelname)s - %(message)s',
+    )
 
     return logger

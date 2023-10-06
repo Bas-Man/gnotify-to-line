@@ -4,7 +4,6 @@ It also provides a test to check the gmail connection.
 """
 import os
 from pathlib import Path
-from typing import Optional
 import httplib2
 from gmail2line.gmail import resource
 
@@ -34,6 +33,14 @@ def check_config_toml_file(config_dir: Path) -> bool:
 
 
 def check_line_token(token_name: str) -> bool:
+    """
+    This function simply allows you to check that the LINE Token provided can be found in the shell
+    environment variable.
+
+    :param token_name: Name of the Token
+    :type token_name: str
+    :returns: A boolean
+    """
     has_token = os.getenv(token_name)
     return has_token is not None
 
