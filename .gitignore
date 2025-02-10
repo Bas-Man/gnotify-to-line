@@ -13,3 +13,4 @@ docs
 .vscode
 pyrightconfig.json
 .tox
+Session.vim
