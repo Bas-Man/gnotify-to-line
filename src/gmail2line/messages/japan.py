@@ -2,6 +2,7 @@
 """
 This module contains functions for building message strings based on the contents of `data`
 """
+
 from typing import Optional
 
 
@@ -16,7 +17,8 @@ def nichinoken(name: Optional[str], data: dict) -> str:
         f"Nichinoken Notification"
         f"""{f" for {name}" if name is not None else ""}.\n"""
         f"{data['date']} at {data['time']}"
-           )
+    )
+
 
 def train(name: Optional[str], data: dict) -> str:
     """
@@ -25,7 +27,7 @@ def train(name: Optional[str], data: dict) -> str:
     :returns: Train notification message string
     :rtype: str
     """
-    if data['enterexit'] == "入場":
+    if data["enterexit"] == "入場":
         status = "Entered"
     else:
         status = "Exited"
@@ -34,7 +36,8 @@ def train(name: Optional[str], data: dict) -> str:
         f"""{f" for {name}" if name is not None else ""}.\n"""
         f"{data['date']} at {data['time']}\n"
         f"{status} {data['station']}"
-           )
+    )
+
 
 def bus(name: Optional[str], data: dict) -> str:
     """
@@ -43,11 +46,13 @@ def bus(name: Optional[str], data: dict) -> str:
     :return: Bus notification message string.
     :rtype: str
     """
-    return (f"{name} boarded \n"
-            f" the {data['busname']} bound for \n"
-            f"{data['destination']} at stop: {data['stop']}\n"
-            f"at {data['time']} on {data['date']}"
-            )
+    return (
+        f"""{f"{name} boarded" if name is not None else ""}"""
+        f" the {data['busname']} bound for \n"
+        f"{data['destination']} at stop: {data['boardedat']}\n"
+        f"at {data['time']} on {data['date']}"
+    )
+
 
 def gate(name: Optional[str], data: dict) -> str:
     """
@@ -56,9 +61,8 @@ def gate(name: Optional[str], data: dict) -> str:
     :return: School Gate notification message string
     :rtype: str
     """
-    return (f"{name} passed the school gate.\n"
-            f"{data['date']} at {data['time']}"
-            )
+    return f"{name} passed the school gate.\n" f"{data['date']} at {data['time']}"
+
 
 def kidzduo(name: Optional[str], data: dict) -> str:
     """
@@ -72,7 +76,8 @@ def kidzduo(name: Optional[str], data: dict) -> str:
         f"""{f" for {name}" if name is not None else ""}.\n"""
         f"{data['date']} at {data['time']}\n"
         f"KidzDuo{data['enterexit']}"
-            )
+    )
+
 
 def tokyoinstitute(name: Optional[str], data: dict) -> str:
     """
@@ -85,4 +90,4 @@ def tokyoinstitute(name: Optional[str], data: dict) -> str:
         f"{data['location']} Notification"
         f"""{f" for {name}" if name is not None else ""}.\n"""
         f"{data['date']} {data['enterexit']}"
-            )
+    )
