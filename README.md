@@ -4,13 +4,13 @@ This is a script that connects to Google's Gmail Service through its API. Collec
 
 ## Requirements
 
-You have already setup your **LINE** Group so that notifications can be sent to several users at once. **Please be aware that you need to setup the group within your Mobile Phone LINE.***
+You have already set up your **LINE** Group so that notifications can be sent to several users at once. **Please be aware that you need to set the group within your Mobile Phone LINE.**
 
 See: [Setting up LINE. &mdash; Gmail + Zapier + LINE Notifications 0.1.0 documentation](https://gmailzapierlinenotify.readthedocs.io/en/latest/setting-up-line.html)
 
 ## Package Installation
 
-Download the package from github and simply run:
+Download the package from GitHub and simply run:
 
 ```bash
 pip install <Package Name>
@@ -26,7 +26,7 @@ pip install <Package Name>
 
 3. token.pickle
 
-`credentials.json` is obtained from Google  and `token.pickle` is generated when you run the script and authenticate against Google. `config.toml` is the file you will need to manage by hand.
+`credentials.json` is obtained from Google and `token.pickle` is generated when you run the script and authenticate against Google. `config.toml` is the file you will need to manage by hand.
 
 The configuration files are expected to live in your home directory under *` ~/.config/gmail2line/*
 
@@ -38,7 +38,7 @@ The configuration files are expected to live in your home directory under *` ~/.
 lvl = 'INFO' # Lvls: INFO, DEBUG, WARN
 
 [gmail]
-# Google search String. The label as seen below are applied by Gmail
+# Google Search String. The labels as seen below are applied by Gmail
 # through its filtering system. You will need to set this up.
 search = '((label:kidsduo OR label:pasmo OR label:nichinoken OR label:linenotification) AND -label:notified) AND newer_than:1d'
 # If archive is true. Then processed emails will be removed from
@@ -69,12 +69,12 @@ archive = false
   regex = '(?P<date>\d{2}月\d{2}日)　(?P<time>\d{2}時\d{2}分)\nREAPLACEME\n「(?P<provider>[一-龯]+)・(?P<station>.*)」を(?P<enterexit>[一-龯]+)'
 
 # The people section is provided so you can have a consistent name
-# in message. Several services provide varations on a name depending on 
+# in the message. Several services provide variations on a name depending on 
 # how you have registered the person. Some might be full-width Hiragana.
-# Some might be half-width. In Japan some might be 'lastname' then
+# Some might be half-width. In Japan, some might be 'lastname' then
 # 'firstname' 
 # While others might just report a first name. So this section creates 
-# a mapping of the of thee name in the email to the name you would you 
+# a mapping of the name in the email to the name you would 
 # like to see in the notification. If this section is not provided then
 # the name in the email will be used.
 [people]
@@ -86,15 +86,15 @@ archive = false
 
 These need to be kept secure as such the following things should be kept in mind.
 
-1. They should never be stored in git. So they should be added to the `.gitignore` file. This includes the files `credentials.json` and `token.pickle`
+1. They should never be stored in Git. So they should be added to the `.gitignore` file. This includes the files `credentials.json` and `token.pickle`
 
 2. Gmail `label` and Line `Token` are expected to be set as shell environment variables to work with the script. This should prevent them from being leaked from the code.
 
 ## Running the script
 
-If you found this code first on github, I would direct you to [this article series.](https://dev.to/basman/connecting-to-gmail-api-with-python-546b) This will walk you through setting things up with Google.
+If you found this code first on GitHub, I would direct you to [this article series.](https://dev.to/basman/connecting-to-gmail-api-with-python-546b) This will walk you through setting things up with Google.
 
-After going tthough the Google Quick start. You should have downloaded your `credentials.json` file. Run the gmail-sample.py 
+After going through the Google Quick Start. You should have downloaded your `credentials.json` file. Run g2line 
 
 ### First Run
 
@@ -106,7 +106,7 @@ You can either use good old Cron or systemd.
 
 ### Note that you will need to set up the environment variables.
 
-I have included a copy of the two files for systemd which should be located in your home directory under `.config/systemd/user/`. You you need both `gnotifier.service` and `gnotofier.timer` . Once these files are created and edited you can run the command `systemctl --user enable gnotifier.service` followed by `systemctl --user start gnotifier.service` You can check the status the service using `systemctl --user status gnotifier.service`
+I have included a copy of the two files for systemd which should be located in your home directory under `.config/systemd/user/`. You you need both `gnotifier.service` and `gnotofier.timer`. Once these files are created and edited you can run the command `systemctl --user enable gnotifier.service` followed by `systemctl --user start gnotifier.service` You can check the status of the service using `systemctl --user status gnotifier.service`
 
 ## Notes on Regular Expressions.
 
