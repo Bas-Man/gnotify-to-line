@@ -72,8 +72,8 @@ def command():
             logger.info("Processing ending early.")
             sys.exit(ExitCodes.NO_LABEL_ID)
         else:
-            line_token = os.getenv("LINE_TOKEN_PERSONAL")
-            if line_token is None:
+            notification_token = os.getenv("LINE_TOKEN_PERSONAL")
+            if notification_token is None:
                 logger.error(
                     "No LINE Access Token found. Unable to send LINE messages."
                 )
@@ -81,7 +81,7 @@ def command():
                 logger.info("Processing ending early.")
                 sys.exit(ExitCodes.NO_LINE_ACCESS_TOKEN)
             else:
-                process(logger, line_token, label_id, args.suppressed)
+                process(logger, notification_token, label_id, args.suppressed)
 
 
 def get_persons_name(data: dict) -> Optional[str]:
@@ -192,7 +192,7 @@ def process_single_email(gmail_resource, message_id, logger) -> dict:
 
 
 def process(
-    logger, line_token: str, processed_label: str, suppress_notification: bool
+    logger, notification_token: str, processed_label: str, suppress_notification: bool
 ) -> None:  # pylint: disable=too-many-branches,too-many-statements
     """
     This is the main function for processing all email messages that match the
@@ -200,7 +200,7 @@ def process(
     
     Args:
         logger: Logger instance for logging messages
-        line_token: Authentication token for the notification service
+        notification_token: Authentication token for the notification service
         processed_label: Gmail Internal Label ID to mark processed messages
         suppress_notification: If True, notifications will be suppressed
     """
@@ -233,7 +233,7 @@ def process(
         if notification_message:
             logger.debug(data["notifier"].capitalize())
             if not suppress_notification:
-                message_service = NotifierFactory.create('line', {'token': line_token})
+                message_service = NotifierFactory.create('line', {'token': notification_token})
                 message_service.send(notification_message)
             else:
                 # Suppressing notifications.

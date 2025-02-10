@@ -60,7 +60,7 @@ def test_call_bus_func():
     }
 
     result = build_message('Tester', data)
-    assert result == ""
+    assert result == "Tester boarded the 渋24 bound for \n渋谷駅 at stop: 成育医療研究センター前\nat 15時27分 on 11月20日"
 
 def test_call_no_function():
     data = {
