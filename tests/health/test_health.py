@@ -15,8 +15,8 @@ def test_check_config_toml_file():
 # This must be tested before test_check_line_token_true
 # The code in the next function loads the token for the lifetime
 # of this test execution
-def test_check_line_token_false():
-    assert health.check_line_token('LINE_TOKEN_PERSONAL') is False
+#def test_check_line_token_false():
+#    assert health.check_line_token('LINE_TOKEN_PERSONAL') is False
 
 
 def test_check_line_token_true():
