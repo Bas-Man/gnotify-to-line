@@ -119,7 +119,7 @@ def test_live_line_notification():
 
 
 @pytest.mark.skipif(
-    not (os.getenv("PUSHOVER_USER_KEY") and os.getenv("PUSHOVER_APP_TOKEN")),
+    not (os.getenv("PUSHOVER_USER_KEY_DISABLED") and os.getenv("PUSHOVER_APP_TOKEN")),
     reason="PUSHOVER_USER_KEY or PUSHOVER_APP_TOKEN not found in .env file"
 )
 def test_live_pushover_notification():
