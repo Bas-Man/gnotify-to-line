@@ -7,7 +7,7 @@ try:
 except ModuleNotFoundError:
     import tomli as tomllib
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any, Dict, List, Optional, Tuple
 
 
 def load_toml(config_file: Path) -> Dict[str, Any]:
@@ -15,10 +15,10 @@ def load_toml(config_file: Path) -> Dict[str, Any]:
     Load the configuration file
     """
     try:
-        with open(config_file, mode='rb') as file:
+        with open(config_file, mode="rb") as file:
             config: Dict[str, str] = tomllib.load(file)
     except FileNotFoundError:
-        print(f'Config file: {config_file} not found')
+        print(f"Config file: {config_file} not found")
         config = {}
     return config
 
@@ -27,7 +27,7 @@ def gmail_search_string(config: Dict) -> Optional[str]:
     """
     Give easy access to the Gmail Search string.
     """
-    return config['gmail'].get('search')
+    return config["gmail"].get("search")
 
 
 def get_valid_path(config_dir: Path, filename: str) -> Optional[Path]:
@@ -65,12 +65,12 @@ def senders_subjects(
     subjects: List[str] = []
     senders: List[str] = []
     sender_as_key: Dict[str, str] = {}
-    for service_name, service_data in config['services'].items():
-        sender: str = service_data['sender']
+    for service_name, service_data in config["services"].items():
+        sender: str = service_data["sender"]
         senders.append(sender)
         sender_as_key[sender] = service_name
-        if 'subjects' in service_data:
-            for subject in service_data['subjects']:
+        if "subjects" in service_data:
+            for subject in service_data["subjects"]:
                 subjects.append(subject)
     return (senders, subjects, sender_as_key)
 
@@ -80,17 +80,15 @@ def build_name_lookup(config: Dict) -> Optional[Dict[str, str]]:
     Document me
     """
     name_lookup_idx: Dict[str, str] = {}
-    if 'people' in config:
-        for name, name_list in config['people'].items():
-            aliases = name_list.get('alias')
+    if "people" in config:
+        for name, name_list in config["people"].items():
+            aliases = name_list.get("alias")
             for alias in aliases:
                 name_lookup_idx[alias] = name.capitalize()
     return name_lookup_idx
 
 
-def lookup_name(
-    name_lookup_idx: Dict[str, str], alias: Optional[str]
-) -> Optional[str]:
+def lookup_name(name_lookup_idx: Dict[str, str], alias: Optional[str]) -> Optional[str]:
     """
     Document me
     """
@@ -108,7 +106,7 @@ def get_logging_level(config: Dict) -> str:
     :type config: Dict
     :returns: Logging level.
     """
-    return config['log'].get('lvl', 'INFO')
+    return config["log"].get("lvl", "INFO")
 
 
 def gmail_archive_setting(config: Dict) -> Optional[bool]:
@@ -120,12 +118,10 @@ def gmail_archive_setting(config: Dict) -> Optional[bool]:
     :return: True or False or None if there is not configuration value
     :rtype: Optional[bools]
     """
-    return config['gmail'].get('archive')
+    return config["gmail"].get("archive")
 
 
-def service_archive_settings(
-    config: Dict, config_service: str
-) -> Optional[bool]:
+def service_archive_settings(config: Dict, config_service: str) -> Optional[bool]:
     """
     If the service is defined in the config and has an 'archive' option this value will be returned.
 
@@ -134,7 +130,7 @@ def service_archive_settings(
     :Returns: None or the value stored in the option.
     :rtype: Optional[bool]
     """
-    return config['services'][config_service].get('archive')
+    return config["services"][config_service].get("archive")
 
 
 def should_mail_be_archived(
@@ -158,20 +154,20 @@ def should_mail_be_archived(
     return False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from pprint import pprint
 
-    path = Path.home() / '.config' / 'gmail-notify' / 'config.toml'
+    path = Path.home() / ".config" / "gmail-notify" / "config.toml"
     options = load_toml(path)
-    print('All Data')
+    print("All Data")
     pprint(options)
 
     gsearch = gmail_search_string(options)
-    print('GSearch')
+    print("GSearch")
     pprint(gsearch)
     senders, subjects, sender_key = senders_subjects(options)
     pprint(senders)
-    print('\n')
+    print("\n")
     pprint(subjects)
-    print('\n')
+    print("\n")
     pprint(sender_key)
