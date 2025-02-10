@@ -1,23 +1,25 @@
 """A program to send notification through LINE based on Email received."""
 import argparse
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Dict, Optional
+
 from dotenv import load_dotenv
+
+from gmail2line import find_matches, glogger
+from gmail2line.cli import ExitCodes, health
 from gmail2line.config import parser as config_parser
-from gmail2line import glogger
-from gmail2line.notifiers import line
-from gmail2line import find_matches
-from gmail2line.cli import ExitCodes
-from gmail2line.cli import health
-from gmail2line.gmail import resource, mail, label
+from gmail2line.gmail import label, mail, resource
 from gmail2line.messages import builder
+from gmail2line.notifiers.base import NotifierFactory
+from gmail2line.notifiers.line_notifier import LineNotifier  # Required for registration
+from gmail2line.notifiers.pushover_notifier import PushoverNotifier # Required for registration
 
 load_dotenv()
 
-CONFIG_DIR = Path.home() / '.config' / 'gmail-notify'
-TOML_FILE = CONFIG_DIR / 'config.toml'
+CONFIG_DIR = Path.home() / ".config" / "gmail-notify"
+TOML_FILE = CONFIG_DIR / "config.toml"
 
 # Read TOML Configuration File
 config = config_parser.load_toml(TOML_FILE)
@@ -28,38 +30,34 @@ def command():
     Document me
     """
     parse = argparse.ArgumentParser()
-    parse.add_argument('-l', '--label', help='Lookup the ID for LABEL.')
+    parse.add_argument("-l", "--label", help="Lookup the ID for LABEL.")
     parse.add_argument(
-        '-la',
-        '--label-all',
-        help='List all labels in Gmail.',
-        action='store_true',
+        "-la",
+        "--label-all",
+        help="List all labels in Gmail.",
+        action="store_true",
     )
     parse.add_argument(
-        '-ln',
-        '--label-new',
-        help='Register a new label with Gmail.',
-        action='store_true',
+        "-ln",
+        "--label-new",
+        help="Register a new label with Gmail.",
+        action="store_true",
     )
     parse.add_argument(
-        '--health',
-        help='Check for configuration files and Gmail connection',
-        action='store_true',
+        "--health",
+        help="Check for configuration files and Gmail connection",
+        action="store_true",
     )
     parse.add_argument(
-        '--suppressed',
-        help='Process message, but suspress notifications.',
-        action='store_true',
+        "--suppressed",
+        help="Process message, but suspress notifications.",
+        action="store_true",
     )
     args = parse.parse_args()
 
-    logger = glogger.setup_logging(
-        CONFIG_DIR, config_parser.get_logging_level(config)
-    )
+    logger = glogger.setup_logging(CONFIG_DIR, config_parser.get_logging_level(config))
     if args.label_all:
-        label.list_all_labels_and_ids(
-            resource.get_resource(CONFIG_DIR), logger
-        )
+        label.list_all_labels_and_ids(resource.get_resource(CONFIG_DIR), logger)
     elif args.label:
         label.lookup_label_id(resource.get_resource(CONFIG_DIR), logger, args)
     elif args.label_new:
@@ -68,19 +66,19 @@ def command():
         health.check_health(CONFIG_DIR)
     else:
         # Default: Sanity check and call process()
-        label_id = os.getenv('LABEL_ID')
+        label_id = os.getenv("LABEL_ID")
         if label_id is None:
-            logger.error('No Label ID found. Unable to process any message.')
-            logger.info('Processing ending early.')
+            logger.error("No Label ID found. Unable to process any message.")
+            logger.info("Processing ending early.")
             sys.exit(ExitCodes.NO_LABEL_ID)
         else:
-            line_token = os.getenv('LINE_TOKEN_PERSONAL')
+            line_token = os.getenv("LINE_TOKEN_PERSONAL")
             if line_token is None:
                 logger.error(
-                    'No LINE Access Token found. Unable to send LINE messages.'
+                    "No LINE Access Token found. Unable to send LINE messages."
                 )
-                logger.error('Unable to process messages.')
-                logger.info('Processing ending early.')
+                logger.error("Unable to process messages.")
+                logger.info("Processing ending early.")
                 sys.exit(ExitCodes.NO_LINE_ACCESS_TOKEN)
             else:
                 process(logger, line_token, label_id, args.suppressed)
@@ -100,9 +98,9 @@ def get_persons_name(data: dict) -> Optional[str]:
     name: Optional[str] = None
     aliases: Optional[Dict[str, str]] = config_parser.build_name_lookup(config)
     if aliases:
-        name = config_parser.lookup_name(aliases, data.get('name'))
-        if name is None and data.get('name') is not None:
-            name: Optional[str] = data.get('name')
+        name = config_parser.lookup_name(aliases, data.get("name"))
+        if name is None and data.get("name") is not None:
+            name = data.get("name")
     return name
 
 
@@ -111,7 +109,7 @@ def post_processing_gmail_labelling(
     gmail_resource,
     message_id: str,
     processed_label,
-    service: str,
+    service,
 ) -> None:
     """
     This function handles adding the 'notified' label to the message after it
@@ -130,7 +128,7 @@ def post_processing_gmail_labelling(
     """
     # Mail was processed. Add label so its not processed again
     # Gmail only allows for the shortest time interval of one day.
-    logger.debug('adding label')
+    logger.debug("adding label")
     label.add_label_to_message(gmail_resource, message_id, processed_label)
     if config_parser.should_mail_be_archived(
         config_parser.gmail_archive_setting(config),
@@ -158,38 +156,38 @@ def process_single_email(gmail_resource, message_id, logger) -> dict:
     data: Dict[str, str] = {}
     single_email = mail.get_message(gmail_resource, message_id, logger)
     # Check the subject is an expected notification subject line
-    if single_email is not None and 'subject' in single_email:
-        subject: str = single_email.get('subject')
-        logger.debug(f'Subject: {subject}')
-        sender: str = single_email.get('from')
-        logger.debug(f'Sender: {sender}')
+    if single_email is not None and "subject" in single_email:
+        subject: str = single_email.get("subject")
+        logger.debug(f"Subject: {subject}")
+        sender: str = single_email.get("from")
+        logger.debug(f"Sender: {sender}")
         if subject in subjects:
             # workout which notification we are dealing with and use the correct
             # regular expression string
-            logger.debug('Subject Passed.')
+            logger.debug("Subject Passed.")
             key = sender_service_key.get(sender)
-            if key is not None and key in config['services']:
-                if 'regex' in config['services'][key]:
-                    regex: str = config['services'][key].get('regex')
+            if key is not None and key in config["services"]:
+                if "regex" in config["services"][key]:
+                    regex: str = config["services"][key].get("regex")
                     email_body = single_email.get_content()
-                    data: Dict[str, str] = find_matches(email_body, regex)
-                    data['notifier'] = key
+                    data = find_matches(email_body, regex)
+                    data["notifier"] = key
                     return data
             else:
                 # This needs to be logged. Means failed to match sender.
                 logger.warning(
-                    f'Failed to process message_id: {message_id} '
-                    f'Matched Subject: {subject} '
-                    f'Sender not matched: {sender}'
+                    f"Failed to process message_id: {message_id} "
+                    f"Matched Subject: {subject} "
+                    f"Sender not matched: {sender}"
                 )
                 return data
 
         # Not an expected subject line. Ignore this email
-        logger.info('This is not a notification.')
-        logger.info(f'sender: {sender}\n\t')
-        logger.info(f'subject: {subject}\n')
-        logger.debug(f'contents: {single_email.get_content()}\n')
-        logger.debug(f'Data: {data}\n')
+        logger.info("This is not a notification.")
+        logger.info(f"sender: {sender}\n\t")
+        logger.info(f"subject: {subject}\n")
+        logger.debug(f"contents: {single_email.get_content()}\n")
+        logger.debug(f"Data: {data}\n")
     return data
 
 
@@ -197,46 +195,46 @@ def process(
     logger, line_token: str, processed_label: str, suppress_notification: bool
 ) -> None:  # pylint: disable=too-many-branches,too-many-statements
     """
-    This the main function for processing all email messages that match the
-    search conditions.
-    :param logger:
-    :type logger: Object
-    :param line_token: Token for accessing LINE notifier
-    :type line_token: str
-    :param processed_label: Gmail Internal Label ID
-    :type processed_labbel: str
-    :returns: None
+    This is the main function for processing all email messages that match the
+    search conditions and sending notifications.
+    
+    Args:
+        logger: Logger instance for logging messages
+        line_token: Authentication token for the notification service
+        processed_label: Gmail Internal Label ID to mark processed messages
+        suppress_notification: If True, notifications will be suppressed
     """
-    logger.info('Looking for email for notification')
+    logger.info("Looking for email for notification")
     g_search = config_parser.gmail_search_string(config)
     gmail_resource = resource.get_resource(CONFIG_DIR)
     if g_search is None:
-        logger.info('Search String is not valid. Unable to get messages.')
+        logger.info("Search String is not valid. Unable to get messages.")
         sys.exit(ExitCodes.MISSING_GOOGLE_SEARCH_STRING)
     message_ids = mail.get_message_ids(gmail_resource, g_search)
     if not mail.found_messages(message_ids):
-        logger.debug('There were no messages.')
-        logger.info('Ending cleanly with no messages to process')
+        logger.debug("There were no messages.")
+        logger.info("Ending cleanly with no messages to process")
         sys.exit(ExitCodes.OK)
     list_of_message_ids = mail.get_only_message_ids(message_ids)
-    logger.debug(f'message_ids:\n\t{list_of_message_ids}\n')
+    logger.debug(f"message_ids:\n\t{list_of_message_ids}\n")
     for message_id in list_of_message_ids:
         processed = False
         data = process_single_email(gmail_resource, message_id, logger)
-        logger.debug(data['notifier'].capitalize())
-        logger.debug(f'data: {data}\n')
+        logger.debug(data["notifier"].capitalize())
+        logger.debug(f"data: {data}\n")
         # Use Environment provided name.
-        name: Optional[str] = os.getenv('NAME')
-        logger.debug(f'Name: {name}')
+        name: Optional[str] = os.getenv("NAME")
+        logger.debug(f"Name: {name}")
         if name is None:
-            logger.debug('looking up name')
+            logger.debug("looking up name")
             name = get_persons_name(data)
-            logger.debug(f'lookup Name: {name}')
-        notification_message = builder.build_message(name, data)
+            logger.debug(f"lookup Name: {name}")
+        notification_message = str(builder.build_message(name, data))
         if notification_message:
-            logger.debug(data['notifier'].capitalize())
+            logger.debug(data["notifier"].capitalize())
             if not suppress_notification:
-                line.send_notification(notification_message, line_token)
+                message_service = NotifierFactory.create('line', {'token': line_token})
+                message_service.send(notification_message)
             else:
                 # Suppressing notifications.
                 logger.info(
@@ -244,14 +242,12 @@ def process(
                 )
             processed = True
         else:
-            logger.info(
-                f"Caller: {data['notifier']} is not a callable function."
-            )
+            logger.info(f"Caller: {data['notifier']} is not a callable function.")
 
-        if data.get('notifier') is None and data is not None:
-            logger.warning('Subject matched but From was not matched')
-        elif data.get('notifier') is None and data is None:
-            logger.info('Non-Notification email from expected sender')
+        if data.get("notifier") is None and data is not None:
+            logger.warning("Subject matched but From was not matched")
+        elif data.get("notifier") is None and data is None:
+            logger.info("Non-Notification email from expected sender")
 
         if processed:
             post_processing_gmail_labelling(
@@ -259,11 +255,11 @@ def process(
                 gmail_resource,
                 message_id,
                 processed_label,
-                data['notifier'],
+                data["notifier"],
             )
             # End of the program
-    logger.info('Ending cleanly')
+    logger.info("Ending cleanly")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     command()
