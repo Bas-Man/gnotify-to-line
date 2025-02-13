@@ -72,16 +72,28 @@ def command():
             logger.info("Processing ending early.")
             sys.exit(ExitCodes.NO_LABEL_ID)
         else:
-            notification_token = os.getenv("LINE_TOKEN_PERSONAL")
-            if notification_token is None:
-                logger.error(
-                    "No LINE Access Token found. Unable to send LINE messages."
-                )
+            # Build notification credentials dictionary
+            notification_credentials = {}
+            
+            # LINE credentials
+            line_token = os.getenv("LINE_TOKEN_PERSONAL")
+            if line_token:
+                notification_credentials['token'] = line_token
+            
+            # Pushover credentials
+            pushover_user_key = os.getenv("PUSHOVER_USER_KEY")
+            pushover_app_token = os.getenv("PUSHOVER_APP_TOKEN")
+            if pushover_user_key and pushover_app_token:
+                notification_credentials['user_key'] = pushover_user_key
+                notification_credentials['app_token'] = pushover_app_token
+            
+            if not notification_credentials:
+                logger.error("No notification credentials found. Unable to send notifications.")
                 logger.error("Unable to process messages.")
                 logger.info("Processing ending early.")
                 sys.exit(ExitCodes.NO_LINE_ACCESS_TOKEN)
-            else:
-                process(logger, notification_token, label_id, args.suppressed)
+            
+            process(logger, notification_credentials, label_id, args.suppressed)
 
 
 def get_persons_name(data: dict) -> Optional[str]:
@@ -134,12 +146,12 @@ def post_processing_gmail_labelling(
         config_parser.gmail_archive_setting(config),
         config_parser.service_archive_settings(config, service),
     ):
-        label.archive_message(service, message_id)
+        label.archive_message(gmail_resource, message_id)
 
 
 def process_single_email(gmail_resource, message_id, logger) -> dict:
     """
-    Process each message and extract who the notifier is as well as the data
+    Process each message and extract which email service sent it as well as the data
     in the body of the email
 
     :param gmail_resource: Gmail API connection
@@ -171,7 +183,7 @@ def process_single_email(gmail_resource, message_id, logger) -> dict:
                     regex: str = config["services"][key].get("regex")
                     email_body = single_email.get_content()
                     data = find_matches(email_body, regex)
-                    data["notifier"] = key
+                    data["email_service"] = key
                     return data
             else:
                 # This needs to be logged. Means failed to match sender.
@@ -192,7 +204,7 @@ def process_single_email(gmail_resource, message_id, logger) -> dict:
 
 
 def process(
-    logger, notification_token: str, processed_label: str, suppress_notification: bool
+    logger, notification_credentials: dict, processed_label: str, suppress_notification: bool
 ) -> None:  # pylint: disable=too-many-branches,too-many-statements
     """
     This is the main function for processing all email messages that match the
@@ -200,7 +212,7 @@ def process(
     
     Args:
         logger: Logger instance for logging messages
-        notification_token: Authentication token for the notification service
+        notification_credentials: Dictionary containing credentials for notification services
         processed_label: Gmail Internal Label ID to mark processed messages
         suppress_notification: If True, notifications will be suppressed
     """
@@ -220,7 +232,7 @@ def process(
     for message_id in list_of_message_ids:
         processed = False
         data = process_single_email(gmail_resource, message_id, logger)
-        logger.debug(data["notifier"].capitalize())
+        logger.debug(data["email_service"].capitalize())
         logger.debug(f"data: {data}\n")
         # Use Environment provided name.
         name: Optional[str] = os.getenv("NAME")
@@ -231,22 +243,24 @@ def process(
             logger.debug(f"lookup Name: {name}")
         notification_message = str(builder.build_message(name, data))
         if notification_message:
-            logger.debug(data["notifier"].capitalize())
+            logger.debug(data["email_service"].capitalize())
             if not suppress_notification:
-                message_service = NotifierFactory.create('line', {'token': notification_token})
+                # Default to LINE notification service
+                notification_service = 'line'
+                message_service = NotifierFactory.create(notification_service, notification_credentials)
                 message_service.send(notification_message)
             else:
                 # Suppressing notifications.
                 logger.info(
-                    f"Message notification for {data['notifier']} has been suppressed."
+                    f"Message notification for {data['email_service']} has been suppressed."
                 )
             processed = True
         else:
-            logger.info(f"Caller: {data['notifier']} is not a callable function.")
+            logger.info(f"Email service: {data['email_service']} is not a callable function.")
 
-        if data.get("notifier") is None and data is not None:
+        if data.get("email_service") is None and data is not None:
             logger.warning("Subject matched but From was not matched")
-        elif data.get("notifier") is None and data is None:
+        elif data.get("email_service") is None and data is None:
             logger.info("Non-Notification email from expected sender")
 
         if processed:
@@ -255,7 +269,7 @@ def process(
                 gmail_resource,
                 message_id,
                 processed_label,
-                data["notifier"],
+                data["email_service"],
             )
             # End of the program
     logger.info("Ending cleanly")
