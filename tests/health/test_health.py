@@ -1,5 +1,5 @@
 from pathlib import Path
-from gmail2line.cli import health
+from gmail2notification.cli import health
 
 
 def test_check_credentials_json_file():

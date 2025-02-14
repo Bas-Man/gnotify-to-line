@@ -7,14 +7,15 @@ from typing import Dict, Optional
 
 from dotenv import load_dotenv
 
-from gmail2line import find_matches, glogger
-from gmail2line.cli import ExitCodes, health
-from gmail2line.config import parser as config_parser
-from gmail2line.gmail import label, mail, resource
-from gmail2line.messages import builder
-from gmail2line.notifiers.base import NotifierFactory
-from gmail2line.notifiers.line_notifier import LineNotifier  # Required for registration
-from gmail2line.notifiers.pushover_notifier import PushoverNotifier # Required for registration
+from gmail2notification.core.matching import find_matches
+from gmail2notification import glogger
+from gmail2notification.cli import ExitCodes, health
+from gmail2notification.config import parser as config_parser
+from gmail2notification.gmail import label, mail, resource
+from gmail2notification.messages import builder
+from gmail2notification.notifiers.base import NotifierFactory
+from gmail2notification.notifiers.line_notifier import LineNotifier  # Required for registration
+from gmail2notification.notifiers.pushover_notifier import PushoverNotifier # Required for registration
 
 load_dotenv()
 

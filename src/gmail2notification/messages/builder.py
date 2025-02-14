@@ -3,7 +3,7 @@ Module of common message building functions
 """
 from typing import Optional
 
-from gmail2line.messages.japan import (
+from gmail2notification.messages.japan import (
     nichinoken,
     bus,
     train,

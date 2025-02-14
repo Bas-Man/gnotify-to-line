@@ -1,8 +1,8 @@
-# g2line (Gmail to LINE Notifier)
+# g2notification (Gmail to Notification Service)
 
 ## Purpose
 
-g2line is a Python-based utility that connects to Gmail through the Google API to monitor specific emails and automatically forward them as notifications to LINE messenger. It's particularly useful for:
+g2notification is a Python-based utility that connects to Gmail through the Google API to monitor specific emails and automatically forward them as notifications to LINE messenger. It's particularly useful for:
 
 - Monitoring important emails based on Gmail labels
 - Automatically sending notifications to LINE when matching emails are received
@@ -46,7 +46,7 @@ Dependencies will be automatically installed, including:
 
 `credentials.json` is obtained from Google and `token.pickle` is generated when you run the script and authenticate against Google. `config.toml` is the file you will need to manage by hand.
 
-The configuration files are expected to live in your home directory under *` ~/.config/gmail2line/*
+The configuration files are expected to live in your home directory under *` ~/.config/gmail2notification/*
 
 #### Sample Configuration
 
@@ -125,7 +125,7 @@ These need to be kept secure as such the following things should be kept in mind
 
 3. First run of g2line:
    ```bash
-   g2line
+   g2notification
    ```
    This will:
    - Authenticate with Google (creates `token.pickle`)

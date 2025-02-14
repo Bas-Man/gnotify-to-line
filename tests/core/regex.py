@@ -1,5 +1,5 @@
-from gmail2line.core import matching
-from gmail2line.core.patterns.jpn.regex import train
+from gmail2notification.core import matching
+from gmail2notification.core.patterns.jpn.regex import train
 
 
 def test_train():

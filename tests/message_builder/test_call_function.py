@@ -1,4 +1,4 @@
-from gmail2line.messages.builder import build_message
+from gmail2notification.messages.builder import build_message
 
 
 def test_call_train_func_exit():

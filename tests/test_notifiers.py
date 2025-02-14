@@ -5,9 +5,9 @@ from typing import Optional
 from typing_extensions import Protocol
 from dotenv import load_dotenv, find_dotenv
 
-from gmail2line.notifiers.base import NotifierFactory, NotifierProtocol
-from gmail2line.notifiers.line_notifier import LineNotifier
-from gmail2line.notifiers.pushover_notifier import PushoverNotifier
+from gmail2notification.notifiers.base import NotifierFactory, NotifierProtocol
+from gmail2notification.notifiers.line_notifier import LineNotifier
+from gmail2notification.notifiers.pushover_notifier import PushoverNotifier
 
 # Load environment variables from .env file
 load_dotenv()
@@ -58,7 +58,7 @@ def test_from_config_with_missing_token():
 def test_send_notification(mocker, test_token, test_message):
     """Test sending notification"""
     # Create a mock LineNotify instance
-    mock_line_notify = mocker.patch('gmail2line.notifiers.line_notifier.LineNotify')
+    mock_line_notify = mocker.patch('gmail2notification.notifiers.line_notifier.LineNotify')
     mock_instance = mock_line_notify.return_value
 
     # Create notifier and send message
@@ -112,7 +112,7 @@ def test_live_line_notification():
     """Integration test with real LINE Notify service"""
     token = str(os.getenv("LINE_TOKEN_PERSONAL"))
     notifier = LineNotifier(token)
-    test_message = "🧪 Test message from gmail2line integration test"
+    test_message = "🧪 Test message from gmail2notification integration test"
     
     # This will actually send a notification if LINE_NOTIFY_TOKEN is set in .env
     notifier.send(test_message)
@@ -127,7 +127,7 @@ def test_live_pushover_notification():
     user_key = str(os.getenv("PUSHOVER_USER_KEY"))
     app_token = str(os.getenv("PUSHOVER_APP_TOKEN"))
     notifier = PushoverNotifier(user_key, app_token)
-    test_message = "🧪 Test message from gmail2line integration test"
+    test_message = "🧪 Test message from gmail2notification integration test"
     
     # This will actually send a notification if Pushover credentials are set in .env
     notifier.send(test_message, title="Test title2")

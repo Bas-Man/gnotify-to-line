@@ -7,7 +7,7 @@ from pathlib import Path
 
 import httplib2
 
-from gmail2line.gmail import resource
+from gmail2notification.gmail import resource
 
 
 def check_credentials_json_file(config_dir: Path) -> bool:

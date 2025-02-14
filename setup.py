@@ -12,13 +12,13 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 3.12",
 ]
 setup(
-    name="gmail2line",
+    name="gmail2notification",
     version="0.1.1",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     entry_points={
         "console_scripts": [
-            "g2line = gmail2line.scripts.g2line:command",
+            "g2notification = gmail2notification.scripts.g2notification:command",
         ],
     },
     classifiers=CLASSIFIERS,

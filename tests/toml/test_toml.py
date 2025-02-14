@@ -1,4 +1,4 @@
-from gmail2line.config import parser
+from gmail2notification.config import parser
 from pathlib import Path
 
 
