@@ -174,3 +174,68 @@ g2line uses regular expressions to extract relevant information from email conte
   - [Train notification pattern](https://regex101.com/r/zQvrg3/5)
 
 Customize the regex patterns in your `config.toml` file to match your email formats.
+
+## Notifiers and Custom Notifications
+
+The application supports multiple notification services through a modular notifier system. By default, it includes LINE and Pushover notifiers, but you can implement custom notifiers for other services.
+
+### Using Existing Notifiers
+
+1. **LINE Notifier**:
+   - Requires a LINE Notify token
+   - Configure through the `LINE_ACCESS_TOKEN` environment variable
+   - Sends formatted messages to LINE groups or individual chats
+
+2. **Pushover Notifier**:
+   - Requires Pushover application token and user key
+   - Configure through environment variables:
+     ```bash
+     export PUSHOVER_TOKEN=your_app_token
+     export PUSHOVER_USER=your_user_key
+     ```
+
+### Implementing Custom Notifiers
+
+You can create custom notifiers by implementing the base notifier interface:
+
+1. Create a new Python file in the `notifiers` directory
+2. Implement the notifier class with required methods:
+
+```python
+from .base import BaseNotifier
+
+class CustomNotifier(BaseNotifier):
+    def __init__(self, config):
+        super().__init__(config)
+        # Initialize your notifier-specific settings
+
+    def send_notification(self, message):
+        # Implement the notification logic
+        # Return True if successful, False otherwise
+        pass
+
+    def validate_config(self):
+        # Validate notifier-specific configuration
+        # Raise ValueError if configuration is invalid
+        pass
+```
+
+3. Register your notifier in `config.toml`:
+```toml
+[notifiers]
+  [notifiers.custom]
+  enabled = true
+  # Add any notifier-specific configuration
+  api_key = "your_api_key"
+  endpoint = "https://api.example.com/notify"
+```
+
+### Best Practices for Custom Notifiers
+
+1. **Error Handling**: Implement robust error handling for API calls and configuration validation
+2. **Rate Limiting**: Respect service rate limits and implement appropriate delays
+3. **Message Formatting**: Support both plain text and structured message formats
+4. **Configuration Validation**: Validate all required settings during initialization
+5. **Documentation**: Include clear documentation for configuration requirements
+
+For detailed examples and implementation guidelines, refer to the existing notifier implementations in the source code.
