@@ -8,6 +8,8 @@ credentials.json
 __pycache__
 src/gmail2line.egg-info
 src/gmail2line/__pycache__/**
+src/gmail2notification.egg-info
+src/gmail2notification/__pycache__/**
 docs
 .pytest_cache
 .vscode
