@@ -1,20 +1,38 @@
+# g2line (Gmail to LINE Notifier)
+
 ## Purpose
 
-This is a script that connects to Google's Gmail Service through its API. Collects a select set of emails. Then based on the contents of these emails it sends LINE message Notifications. 
+g2line is a Python-based utility that connects to Gmail through the Google API to monitor specific emails and automatically forward them as notifications to LINE messenger. It's particularly useful for:
+
+- Monitoring important emails based on Gmail labels
+- Automatically sending notifications to LINE when matching emails are received
+- Processing email content using configurable regex patterns
+- Supporting multiple notification services (LINE and Pushover)
 
 ## Requirements
 
-You have already set up your **LINE** Group so that notifications can be sent to several users at once. **Please be aware that you need to set the group within your Mobile Phone LINE.**
+1. Python 3.7 or higher
+2. A Google Cloud Project with Gmail API enabled
+3. A LINE Notify account and token
+4. Gmail account with configured labels
 
-See: [Setting up LINE. &mdash; Gmail + Zapier + LINE Notifications 0.1.0 documentation](https://gmailzapierlinenotify.readthedocs.io/en/latest/setting-up-line.html)
+You need to set up a LINE Notify token and configure your LINE group to receive notifications. For LINE setup instructions, see: [Setting up LINE Notifications](https://gmailzapierlinenotify.readthedocs.io/en/latest/setting-up-line.html)
 
-## Package Installation
+## Installation
 
-Download the package from GitHub and simply run:
+You can install g2line directly from GitHub:
 
 ```bash
-pip install <Package Name>
+pip install git+https://github.com/Bas-Man/gnotify-to-line.git
 ```
+
+Dependencies will be automatically installed, including:
+- google-api-python-client
+- google-auth-httplib2
+- google-auth-oauthlib
+- line-notify
+- python-dotenv
+- toml
 
 ## Configuration:
 
@@ -90,32 +108,69 @@ These need to be kept secure as such the following things should be kept in mind
 
 2. Gmail `label` and Line `Token` are expected to be set as shell environment variables to work with the script. This should prevent them from being leaked from the code.
 
-## Running the script
+## Running g2line
 
-If you found this code first on GitHub, I would direct you to [this article series.](https://dev.to/basman/connecting-to-gmail-api-with-python-546b) This will walk you through setting things up with Google.
+### Initial Setup
 
-After going through the Google Quick Start. You should have downloaded your `credentials.json` file. Run g2line 
+1. First, set up your Google Cloud Project and enable the Gmail API:
+   - Follow [this guide](https://dev.to/basman/connecting-to-gmail-api-with-python-546b) for detailed instructions
+   - Download your `credentials.json` file from Google Cloud Console
+   - Place `credentials.json` in `~/.config/gmail2line/`
 
-### First Run
+2. Set up required environment variables:
+   ```bash
+   export GMAIL_LABEL=your_gmail_label
+   export LINE_ACCESS_TOKEN=your_line_token
+   ```
 
-### Second Run
+3. First run of g2line:
+   ```bash
+   g2line
+   ```
+   This will:
+   - Authenticate with Google (creates `token.pickle`)
+   - Verify your configuration
+   - Start monitoring emails
 
-## ## Automating Script Execution
+### Automation
 
-You can either use good old Cron or systemd.
+g2line can be automated using either cron or systemd:
 
-### Note that you will need to set up the environment variables.
+#### Using systemd (Recommended)
 
-I have included a copy of the two files for systemd which should be located in your home directory under `.config/systemd/user/`. You you need both `gnotifier.service` and `gnotofier.timer`. Once these files are created and edited you can run the command `systemctl --user enable gnotifier.service` followed by `systemctl --user start gnotifier.service` You can check the status of the service using `systemctl --user status gnotifier.service`
+1. Create the following files in `~/.config/systemd/user/`:
+   - `gnotifier.service`
+   - `gnotifier.timer`
 
-## Notes on Regular Expressions.
+2. Enable and start the service:
+   ```bash
+   systemctl --user enable gnotifier.service
+   systemctl --user start gnotifier.service
+   ```
 
-The sample provided is based on my own needs here in Japan. If you are planning to use this in another country with another language. You will need to research how to create the needed `regex` strings. The function that performs the regex 
+3. Check service status:
+   ```bash
+   systemctl --user status gnotifier.service
+   ```
 
-[regex101](https://regex101.com) will be your best friend for this.
+#### Using cron
 
-### Sample Regex Links
+Add an entry to your crontab, making sure to include the required environment variables:
 
-[Bus](https://regex101.com/r/iErPZQ/4)
+```bash
+crontab -e
+# Add line like:
+*/5 * * * * export GMAIL_LABEL=label LINE_ACCESS_TOKEN=token; /path/to/g2line
+```
 
-[Train](https://regex101.com/r/zQvrg3/5)
+## Regular Expression Configuration
+
+g2line uses regular expressions to extract relevant information from email content. The default regex patterns are configured for Japanese email formats, but you can customize them for your needs:
+
+- Use [regex101](https://regex101.com) to test your patterns
+- Ensure your regex includes named capture groups for data extraction
+- Reference sample patterns:
+  - [Bus notification pattern](https://regex101.com/r/iErPZQ/4)
+  - [Train notification pattern](https://regex101.com/r/zQvrg3/5)
+
+Customize the regex patterns in your `config.toml` file to match your email formats.
