@@ -8,7 +8,7 @@ def test_call_train_func_exit():
         'provider': '東急電鉄',
         'station': '駒沢大学駅',
         'enterexit': '出場',
-        'notifier': 'train',
+        'email_service': 'train',
     }
 
     result = build_message('Tester', data)
@@ -25,7 +25,7 @@ def test_call_train_func_entered():
         'provider': '東急電鉄',
         'station': '駒沢大学駅',
         'enterexit': '入場',
-        'notifier': 'train',
+        'email_service': 'train',
     }
 
     result = build_message('Tester', data)
@@ -40,7 +40,7 @@ def test_call_institute_func():
         'date': '08月17日 16時50分',
         'enterexit': 'に入室しました',
         'location': '駒沢大学教室',
-        'notifier': 'tokyoinstitute',
+        'email_service': 'tokyoinstitute',
     }
 
     result = build_message('Tester', data)
@@ -56,7 +56,7 @@ def test_call_bus_func():
         'busname': '渋24',
         'destination': '渋谷駅',
         'boardedat': '成育医療研究センター前',
-        'notifier': 'bus',
+        'email_service': 'bus',
     }
 
     result = build_message('Tester', data)
@@ -69,7 +69,7 @@ def test_call_no_function():
         'provider': '東急電鉄',
         'station': '駒沢大学駅',
         'enterexit': '出場',
-        'notifier': 'bogus',
+        'email_service': 'bogus',
     }
 
     result = build_message('Tester', data)

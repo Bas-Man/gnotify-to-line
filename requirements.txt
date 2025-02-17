@@ -5,4 +5,5 @@ line-notify==0.1.4
 python-dotenv==0.21.1
 toml==0.10.2
 tomli==2.0.1
-typing-extensions>=3.7.4
+six==1.17.0
+typing-extensions==4.12.2
