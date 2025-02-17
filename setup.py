@@ -34,11 +34,17 @@ setup(
         "toml==0.10.2",
         "tomli==2.0.1",
         "python-dotenv==0.21.1",
+        "six==1.17.0",
+        "typing-extensions==4.12.2",
     ],
     extras_require={
         # List development-specific dependencies herepy
         "dev": [
             "pytest==7.4.0",
+            "black>=22.0.0",
+            "pylint>=2.17.0",
+            "mypy>=1.0.0",
+            "pytest-mock>=3.10.0",
         ],
     },
 )
