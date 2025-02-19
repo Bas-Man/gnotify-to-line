@@ -4,7 +4,6 @@ CLASSIFIERS = [
     "Intended Audience :: Developers",
     "Topic :: Internet",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -13,6 +12,7 @@ CLASSIFIERS = [
 ]
 setup(
     name="gmail2notification",
+    python_requires=">3.8.0",
     version="0.1.1",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
