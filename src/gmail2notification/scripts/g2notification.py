@@ -75,25 +75,25 @@ def command():
         else:
             # Build notification credentials dictionary
             notification_credentials = {}
-            
+
             # LINE credentials
             line_token = os.getenv("LINE_TOKEN_PERSONAL")
             if line_token:
                 notification_credentials['token'] = line_token
-            
+
             # Pushover credentials
             pushover_user_key = os.getenv("PUSHOVER_USER_KEY")
             pushover_app_token = os.getenv("PUSHOVER_APP_TOKEN")
             if pushover_user_key and pushover_app_token:
                 notification_credentials['user_key'] = pushover_user_key
                 notification_credentials['app_token'] = pushover_app_token
-            
+
             if not notification_credentials:
                 logger.error("No notification credentials found. Unable to send notifications.")
                 logger.error("Unable to process messages.")
                 logger.info("Processing ending early.")
                 sys.exit(ExitCodes.NO_LINE_ACCESS_TOKEN)
-            
+
             process(logger, notification_credentials, label_id, args.suppressed)
 
 
@@ -210,7 +210,7 @@ def process(
     """
     This is the main function for processing all email messages that match the
     search conditions and sending notifications.
-    
+
     Args:
         logger: Logger instance for logging messages
         notification_credentials: Dictionary containing credentials for notification services
@@ -226,6 +226,8 @@ def process(
     message_ids = mail.get_message_ids(gmail_resource, g_search)
     if not mail.found_messages(message_ids):
         logger.debug("There were no messages.")
+        logger.info("Closing Gmail resource")
+        gmail_resource.close()
         logger.info("Ending cleanly with no messages to process")
         sys.exit(ExitCodes.OK)
     list_of_message_ids = mail.get_only_message_ids(message_ids)
@@ -273,6 +275,8 @@ def process(
                 data["email_service"],
             )
             # End of the program
+    logger.info("Closing Gmail Connection")
+    gmail_resource.close()
     logger.info("Ending cleanly")
 
 
