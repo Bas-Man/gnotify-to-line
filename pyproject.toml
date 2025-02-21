@@ -65,7 +65,7 @@ namespaces = false  # Disable implicit namespaces
 
 [tool.tox]
 requires = ["tox>=4.19"]
-envlist = ["py38", "py39", "py310", "py311", "py312"]
+envlist = ["py38", "py39", "py310", "py311", "py312", "py313"]
 isolated_build = true
 
 [tool.tox.env_run_base]
