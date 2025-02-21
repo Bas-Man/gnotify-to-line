@@ -26,7 +26,18 @@ You can install g2line directly from GitHub:
 pip install git+https://github.com/Bas-Man/gnotify-to-line.git
 ```
 
+I recommend using a virtual environment to isolate dependencies:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install git+https://github.com/Bas-Man/gnotify-to-line.git
+```
+
+This will allow you to modify the code for your own use case.
+
 Dependencies will be automatically installed, including:
+
 - google-api-python-client
 - google-auth-httplib2
 - google-auth-oauthlib
@@ -46,7 +57,7 @@ Dependencies will be automatically installed, including:
 
 `credentials.json` is obtained from Google and `token.pickle` is generated when you run the script and authenticate against Google. `config.toml` is the file you will need to manage by hand.
 
-The configuration files are expected to live in your home directory under *` ~/.config/gmail2notification/*
+The configuration files are expected to live in your home directory under _` ~/.config/gmail2notification/_
 
 #### Sample Configuration
 
@@ -75,8 +86,8 @@ archive = false
   # Regular expression for extracting data from the email for use in the
   # notification message
   regex = '(?P<date>\d{2}月\d{2}日)\s(?P<time>\d{2}時\d{2}分)(?:\r)?\nREPLACEME(?:\r)?\n「(?P<busname>[一-龯]\d{1,2})\s(?P<destination>[一-龯]+)行き・(?P<boardedat>[一-龯]+)」'
-  # Service level archive setting. Overrides Gmail level setting if 
-  # present. If archive is not present. Gmail setting is used. If 
+  # Service level archive setting. Overrides Gmail level setting if
+  # present. If archive is not present. Gmail setting is used. If
   # it is present. It overrides Gmail settings.
   archive = true
   [services.train]
@@ -87,12 +98,12 @@ archive = false
   regex = '(?P<date>\d{2}月\d{2}日)　(?P<time>\d{2}時\d{2}分)\nREAPLACEME\n「(?P<provider>[一-龯]+)・(?P<station>.*)」を(?P<enterexit>[一-龯]+)'
 
 # The people section is provided so you can have a consistent name
-# in the message. Several services provide variations on a name depending on 
+# in the message. Several services provide variations on a name depending on
 # how you have registered the person. Some might be full-width Hiragana.
 # Some might be half-width. In Japan, some might be 'lastname' then
-# 'firstname' 
-# While others might just report a first name. So this section creates 
-# a mapping of the name in the email to the name you would 
+# 'firstname'
+# While others might just report a first name. So this section creates
+# a mapping of the name in the email to the name you would
 # like to see in the notification. If this section is not provided then
 # the name in the email will be used.
 [people]
@@ -113,11 +124,13 @@ These need to be kept secure as such the following things should be kept in mind
 ### Initial Setup
 
 1. First, set up your Google Cloud Project and enable the Gmail API:
+
    - Follow [this guide](https://dev.to/basman/connecting-to-gmail-api-with-python-546b) for detailed instructions
    - Download your `credentials.json` file from Google Cloud Console
    - Place `credentials.json` in `~/.config/gmail2line/`
 
 2. Set up required environment variables:
+
    ```bash
    export GMAIL_LABEL=your_gmail_label
    export LINE_ACCESS_TOKEN=your_line_token
@@ -139,10 +152,12 @@ g2line can be automated using either cron or systemd:
 #### Using systemd (Recommended)
 
 1. Create the following files in `~/.config/systemd/user/`:
+
    - `gnotifier.service`
    - `gnotifier.timer`
 
 2. Enable and start the service:
+
    ```bash
    systemctl --user enable gnotifier.service
    systemctl --user start gnotifier.service
@@ -160,7 +175,7 @@ Add an entry to your crontab, making sure to include the required environment va
 ```bash
 crontab -e
 # Add line like:
-*/5 * * * * export GMAIL_LABEL=label LINE_ACCESS_TOKEN=token; /path/to/g2line
+*/5 * * * * export GMAIL_LABEL=label LINE_ACCESS_TOKEN=token; /path/to/g2notification
 ```
 
 ## Regular Expression Configuration
@@ -182,6 +197,7 @@ The application supports multiple notification services through a modular notifi
 ### Using Existing Notifiers
 
 1. **LINE Notifier**:
+
    - Requires a LINE Notify token
    - Configure through the `LINE_ACCESS_TOKEN` environment variable
    - Sends formatted messages to LINE groups or individual chats
@@ -221,6 +237,7 @@ class CustomNotifier(BaseNotifier):
 ```
 
 3. Register your notifier in `config.toml`:
+
 ```toml
 [notifiers]
   [notifiers.custom]
