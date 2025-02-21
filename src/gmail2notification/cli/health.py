@@ -9,6 +9,25 @@ import httplib2
 
 from gmail2notification.gmail import resource
 
+def check_config_path(config_dir: Path) -> bool:
+    """
+    Checks for the existence of the file: config.toml
+
+    :param config_dir: Configuration directory where the file is expected to be.
+    :type config_dir: Path
+    :returns: bool
+    """
+    file_check = config_dir / "config.toml"
+    return file_check.exists()
+
+def show_config_path(config_dir: Path) -> None:
+    """
+    Prints the path to the config.toml file.
+
+    :param config_dir: Configuration directory where the file is expected to be.
+    :type config_dir: Path
+    """
+    print(f"Config Dir: {config_dir}")
 
 def check_credentials_json_file(config_dir: Path) -> bool:
     """
@@ -56,6 +75,7 @@ def check_health(config_dir: Path) -> None:
     :returns: None
     """
     has_errors = False
+    show_config_path(config_dir)
     print("Checking for file: credentials.json")
     if check_credentials_json_file(config_dir) is False:
         print("Unable to find file: credentials.json")

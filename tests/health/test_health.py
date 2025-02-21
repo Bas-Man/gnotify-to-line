@@ -24,3 +24,11 @@ def test_check_line_token_true():
 
     load_dotenv()
     assert health.check_line_token('LINE_TOKEN_PERSONAL') is True
+
+def test_check_config_path():
+    config_dir: Path = Path.cwd().joinpath('tests', 'toml')
+    assert health.check_config_path(config_dir) == True
+
+def test_show_config_path():
+    config_dir: Path = Path.cwd().joinpath('tests', 'toml')
+    health.show_config_path(config_dir)
