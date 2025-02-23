@@ -45,6 +45,7 @@ dev = [
   "pylint>=2.17.0",
   "mypy>=1.0.0",
   "pytest-mock>=3.10.0",
+  "sphinx>=7.1.2",
 ]
 [project.urls]
 Repository = "https://github.com/bas-man/gnotify-to-line"
