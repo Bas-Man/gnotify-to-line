@@ -77,10 +77,11 @@ def test_service_archive_settings_tokyoinstitute_false():
 
 
 def test_people():
-    config_path = Path.cwd() / 'tests' / 'toml' / 'config.toml'
+    config_path = Path.cwd().joinpath('tests', 'toml', 'config.toml')
     config = parser.load_toml(config_path)
     names = parser.build_name_lookup(config)
     assert names is not None
-    assert 'Tamao' == parser.lookup_name(names, 'ｽﾊﾟﾝ ﾀﾏｵ ｱｲﾋﾞｰﾛｰｽﾞ')
+    assert 'Sally' == parser.lookup_name(names, '田中 sally')
+    assert 'Sally' == parser.lookup_name(names, '田中 Sally')
     assert 'Bob' == parser.lookup_name(names, 'billy bob')
     assert parser.lookup_name(names, 'bogus') is None
