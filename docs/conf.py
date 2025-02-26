@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "Gmail2Notification"
-copyright = "2023, Adam Spann"
+copyright = "2023, Adam.S"
 author = "Adam.S"
 
 version = "0.2.0"
@@ -25,6 +25,20 @@ extensions = [
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+
+latex_engine = "xelatex"
+latex_use_xindy = False
+
+latex_elements = {
+    "papersize": "a4paper",
+    "fontpkg": r"""
+    \usepackage{xeCJK}
+    \setCJKmainfont{Noto Sans CJK JP}
+    """,
+    "inputenc": "",
+    "utf8extra": "",
+}
+
 
 language = "en"
 
