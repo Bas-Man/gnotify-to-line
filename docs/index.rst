@@ -4,13 +4,17 @@
    contain the root `toctree` directive.
 
 Welcome to Gmail2Notification's documentation!
-==========================================
+==============================================
 
 .. toctree::
-   :maxdepth: 6
+   :maxdepth: 2 
    :caption: Contents:
 
+   introduction
+   installation
+   quickstart
    gmail2notification
+   code_of_conduct
 
 
 Indices and tables
