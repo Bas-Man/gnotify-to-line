@@ -90,12 +90,15 @@ def check_health(config_dir: Path) -> None:
         has_errors = True
     print("Checking connection to Google.")
     try:
-        if resource.get_resource(config_dir) is None:
-            print("Unable to connect to Gmail")
-            has_errors = True
+        with resource.get_resource(config_dir) as service:
+            # Attempt to fetch labels (a simple API call)
+            service.users().labels().list(userId='me').execute()
     except httplib2.ServerNotFoundError as message:
         print(f"{message}")
         print("Check your network settings.")
+        has_errors = True
+    except Exception as e:
+        print(f"Error connecting to Gmail: {e}")
         has_errors = True
     if has_errors:
         print("Unable to run. Please check the reported errors.")

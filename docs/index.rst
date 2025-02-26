@@ -6,13 +6,16 @@
 Welcome to Gmail2Notification's documentation!
 ==============================================
 
+This is the complete documentation for the Gmail2Notification project.
+
 .. toctree::
-   :maxdepth: 2 
+   :maxdepth: 2
    :caption: Contents:
 
    introduction
    installation
    quickstart
+   gmail-config
    gmail2notification
    code_of_conduct
 
