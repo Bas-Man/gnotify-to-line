@@ -1,0 +1,45 @@
+[log]
+lvl = 'INFO' # Lvls: INFO, DEBUG, WARN
+
+[gmail]
+search = '((label:name-kidsduo OR label:name-pasmo OR label:name-nichinoken OR label:linenotification) AND -label:notified) AND newer_than:1d'
+archive = false
+
+[services]
+  [services.bus]
+  sender = "noreply@tskids.jp"
+  subjects = [ "エキッズ" ]
+  regex = 'r"""(?P<date>\d{2}月\d{2}日)\s(?P<time>\d{2}時\d{2}分)(?:\r)?\nタマオアイビーローズさん(?:\r)?\n「(?P<busname>[一-龯]\d{1,2})\s(?P<destination>[一-龯]+)行き・(?P<boardedat>[一-龯]+)」"""'
+  archive = true
+  [services.train]
+  sender = "東急セキュリティ <tskids@goopas.jp>"
+  subjects = ["エキッズ" ]
+  enter = "入場"
+  exit = "出場"
+  regex = '(?P<date>\d{2}月\d{2}日)　(?P<time>\d{2}時\d{2}分)\nタマオアイビーローズさん\n「(?P<provider>[一-龯]+)・(?P<station>[一-龯]+)」を(?P<enterexit>[一-龯]+)'
+  [services.school]
+  sender = "キッズセキュリティ ミマモルメ <mimamorume@hanshin-anshin.jp>"
+  subjects = ["【キッズセキュリティミマモルメ】通過のお知らせ"]
+  regex = '(?:.*(?:\r)?\n){2}(?P<school>.*)校(?:.*(?:\r)?\n).*(?:\r)?\n{2}(?P<date>(?:\d{4}(?:[一-龯]|-)\d{2}(?:[一-龯]|[-])\d{2}[一-龯]?))\s{1,2}(?P<time>\d{2}(?:[一-龯]|:)\d{2}(?:[一-龯]|[:])\d{2}(?:[一-龯]|))'
+  [services.kidzduo]
+  sender = "ie-square@1915.jp"
+  subjects = [ "入退室情報のお知らせ"]
+  enter = "に入室しました"
+  exit = "に退室しました"
+  regex2 = '(?P<location>KidsDuo\s[一-龯]+)(?:\r)?\n(?:.*)(?:(?:\r)?:w:\n)+(?:.*)(?:\r)?\n(?P<date>(?:\d{4}(?:[一-龯]|-)\d{2}(?:[一-龯]|[-])\d{2}[一-龯]?))\s{1,2}(?P<time>\d{2}(?:[一-龯]|:)\d{2}(?:[一-龯]|[:])\d{2}(?:[一-龯]|))\s(?P<enterexit>(?:に入室しました)|(?:に退室しました))?'
+  regex = '(?P<date>(?:\d{4}(?:[一-龯]|-)\d{2}(?:[一-龯]|[-])\d{2}[一-龯]?))\s{1,2}(?P<time>\d{2}(?:[一-龯]|:)\d{2}(?:[一-龯]|[:])\d{2}(?:[一-龯]|))\s(?P<enterexit>(?:に入室しました)|(?:に退室しました))?'
+  [services.nichinoken]
+  sender = "myn@nichinoken.co.jp"
+  subjects = ["日能研パス・サイン　メール送信"]
+  regex = '(?P<date>\d{2}月\d{2}日)\s(?P<time>\d{2}時\d{2}分)(?:(?:(?:\r)?\n)+[^\n]+)(?:\r)?\n「(?P<location>[一-龯]+　[一-龯]+　\d)」'
+  [services.tokyoinstitute]
+  sender = "東京個別指導学院 <oshirase@tkg-jp.com>"
+  subjects = ["退室のご連絡", "入室のご連絡" ]
+  regex = 'タロ さんが\s(?:\d{4}年)(?P<date>(?:\d{2}(?:[一-龯])\d{2}(?:[一-龯])\s\d{2}(?:[一-龯])\d{2}(?:[一-龯])))\s(?P<enterexit>(?:に入室しました)|(?:に退室しました))。（(?P<location>(?:[一-龯]+))）'
+  archive = false
+
+[people]
+    [people.sally]
+    alias = ["sally", "田中 sally", "田中 Sally", "Sally Tanaka" ]
+    [people.bob]
+    alias = ["billy", "billy bob"]
