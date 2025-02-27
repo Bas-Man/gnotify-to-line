@@ -5,6 +5,14 @@ This package provides functions which allow you to access and extract data from 
 Gmail Service and send a notification based on an email through a service such as
 `LINE` and `Pushover` or some other service which you may add support for.
 
+Module contents
+---------------
+
+.. automodule:: gmail2notification
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -95,14 +103,6 @@ gmail2notification.notifiers.line module
 ----------------------------------------
 
 .. automodule:: gmail2notification.notifiers.line
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: gmail2notification
    :members:
    :undoc-members:
    :show-inheritance:

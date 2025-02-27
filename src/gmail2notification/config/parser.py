@@ -157,7 +157,7 @@ def should_mail_be_archived(
 if __name__ == "__main__":
     from pprint import pprint
 
-    path = Path.home() / ".config" / "gmail-notify" / "config.toml"
+    path = Path.home().joinpath(".config", "gmail-notify","config.toml")
     options = load_toml(path)
     print("All Data")
     pprint(options)

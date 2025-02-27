@@ -17,12 +17,11 @@ Here’s a basic example to fetch emails and send a notification:
 Configuration File
 __________________
 
-Including a TOML Configuration
-==============================
+TOML Configuration
+==================
 
 You can configure the application using a `config.toml` file:
 
 .. literalinclude:: ../tests/toml/config.toml
    :language: toml
    :linenos:
-
