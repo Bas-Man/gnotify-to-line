@@ -71,7 +71,7 @@ gmail2notification.gmail module
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: gmail2notification.gmail.resource
+.. automodule:: gmail2notification.gmail.client
    :members:
    :undoc-members:
    :show-inheritance:

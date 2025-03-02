@@ -3,7 +3,7 @@
 This module provides functions for dealing with the config.toml file.
 """
 try:
-    import tomllib
+    import tomllib # pyright: ignore[reportMissingImports] // Not available prior to Python 3.11
 except ModuleNotFoundError:
     import tomli as tomllib
 from pathlib import Path

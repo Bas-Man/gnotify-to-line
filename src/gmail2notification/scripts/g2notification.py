@@ -11,7 +11,7 @@ from gmail2notification.core.matching import find_matches
 from gmail2notification import glogger
 from gmail2notification.cli import ExitCodes, health
 from gmail2notification.config import parser as config_parser
-from gmail2notification.gmail import label, mail, resource
+from gmail2notification.gmail import label, mail, client
 from gmail2notification.messages import builder
 from gmail2notification.notifiers.base import NotifierFactory
 from gmail2notification.notifiers.line_notifier import LineNotifier  # Required for registration
@@ -58,11 +58,11 @@ def command():
 
     logger = glogger.setup_logging(CONFIG_DIR, config_parser.get_logging_level(config))
     if args.label_all:
-        label.list_all_labels_and_ids(resource.get_resource(CONFIG_DIR), logger)
+        label.list_all_labels_and_ids(client.get_resource(CONFIG_DIR), logger)
     elif args.label:
-        label.lookup_label_id(resource.get_resource(CONFIG_DIR), logger, args)
+        label.lookup_label_id(client.get_resource(CONFIG_DIR), logger, args)
     elif args.label_new:
-        label.setup_new_label(resource.get_resource(CONFIG_DIR))
+        label.setup_new_label(client.get_resource(CONFIG_DIR))
     elif args.health:
         health.check_health(CONFIG_DIR)
     else:
@@ -219,7 +219,7 @@ def process(
     """
     logger.info("Looking for email for notification")
     g_search = config_parser.gmail_search_string(config)
-    gmail_resource = resource.get_resource(CONFIG_DIR)
+    gmail_resource = client.get_resource(CONFIG_DIR)
     if g_search is None:
         logger.info("Search String is not valid. Unable to get messages.")
         sys.exit(ExitCodes.MISSING_GOOGLE_SEARCH_STRING)

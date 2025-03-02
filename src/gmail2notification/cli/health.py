@@ -1,5 +1,5 @@
 """
-This modules provides functionality to check configuration files can be found.
+This module provides functionality to check configuration files can be found.
 It also provides a test to check the gmail connection.
 """
 import os
@@ -7,7 +7,7 @@ from pathlib import Path
 
 import httplib2
 
-from gmail2notification.gmail import resource
+from gmail2notification.gmail import client
 
 def check_config_path(config_dir: Path) -> bool:
     """
@@ -90,7 +90,7 @@ def check_health(config_dir: Path) -> None:
         has_errors = True
     print("Checking connection to Google.")
     try:
-        with resource.get_resource(config_dir) as service:
+        with client.get_resource(config_dir) as service:
             # Attempt to fetch labels (a simple API call)
             service.users().labels().list(userId='me').execute()
     except httplib2.ServerNotFoundError as message:
