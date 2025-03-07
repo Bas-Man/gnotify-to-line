@@ -9,13 +9,15 @@ Install `gmail2notification` using pip. There are two main options
 
 .. code-block:: sh
 
-    pip install git+https://github.com/bas-man/gmail2notification
+    pip install git+https://github.com/bas-man/gnotify-to-line
 
 Alternatively you can install it using as an egg which will allow you to both run and edit the g2notification code.
 This requires that you download the source code before installing.
 
 .. code-block:: sh
 
+    git clone https://github.com/bas-man/gnotify-to-line.git
+    cd gnotify-to-line
     pip install -e .["dev"]
 
 You will need a Gmail API key. Follow these steps to set up authentication:
